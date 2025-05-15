@@ -8,6 +8,7 @@ const useCategories = () => {
 
   useEffect(() => {
     const fetch = async () => {
+      
       try {
         const token = sessionStorage.getItem("token");
         const data = await getAllCategories(token);

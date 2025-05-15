@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -20,7 +19,7 @@ const CreateEvent = () => {
     date: "",
     location: "",
     category: "",
-    ticketTypes: [{ type: "", price: 0, quantity: 0 }],
+    ticketTypes: [{ type: "", price: "", initialQuantity: "" }],
     image: null,
   });
 
@@ -34,8 +33,13 @@ const CreateEvent = () => {
   };
 
   const handleTicketChange = (index, e) => {
+    const { name, value } = e.target;
     const newTickets = [...eventData.ticketTypes];
-    newTickets[index][e.target.name] = e.target.value;
+
+    newTickets[index][name] = ["price", "initialQuantity"].includes(name)
+      ? parseFloat(value) || 0
+      : value;
+
     setEventData({
       ...eventData,
       ticketTypes: newTickets,
@@ -43,19 +47,31 @@ const CreateEvent = () => {
   };
 
   const addTicketType = () => {
-    setEventData((prev) => ({
-      ...prev,
-      ticketTypes: [...prev.ticketTypes, { type: "", price: 0, quantity: 0 }],
-    }));
+    setEventData({
+      ...eventData,
+      ticketTypes: [
+        ...eventData.ticketTypes,
+        { type: "", price: "", initialQuantity: "" },
+      ],
+    });
+  };
+
+  const removeTicketType = (index) => {
+    const newTickets = [...eventData.ticketTypes];
+    newTickets.splice(index, 1);
+    setEventData({
+      ...eventData,
+      ticketTypes: newTickets,
+    });
   };
 
   const handleImageChange = (e) => {
     setEventData({ ...eventData, image: e.target.files[0] });
   };
 
-  const calculateAvailableTickets = () => {
+  const calculateTotalTickets = () => {
     return eventData.ticketTypes.reduce(
-      (sum, ticket) => sum + Number(ticket.quantity || 0),
+      (sum, ticket) => sum + (ticket.initialQuantity || 0),
       0
     );
   };
@@ -63,6 +79,7 @@ const CreateEvent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError("");
 
     try {
       const formData = new FormData();
@@ -71,27 +88,25 @@ const CreateEvent = () => {
       formData.append("date", eventData.date);
       formData.append("location", eventData.location);
       formData.append("category", eventData.category);
-      formData.append("availableTickets", calculateAvailableTickets());
-      
-      // Stringify ticketTypes (as your backend expects)
-      formData.append("ticketTypes", JSON.stringify(eventData.ticketTypes));
 
-      // Append image if it exists
+      // Prepare ticket types with initialQuantity
+      const ticketTypes = eventData.ticketTypes.map((ticket) => ({
+        type: ticket.type,
+        price: parseFloat(ticket.price) || 0,
+        initialQuantity: parseFloat(ticket.initialQuantity) || 0,
+      }));
+
+      formData.append("ticketTypes", JSON.stringify(ticketTypes));
+
       if (eventData.image) {
         formData.append("image", eventData.image);
       }
 
       await createEvent(formData);
       navigate("/admin/events");
-    } catch (error) {
-      let errorMessage = "Failed to create event";
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      setError(errorMessage);
-      console.error("Detailed error:", error);
+    } catch (err) {
+      console.error("Event creation error:", err);
+      setError(err.response?.data?.message || "Failed to create event");
     } finally {
       setIsSubmitting(false);
     }
@@ -167,73 +182,93 @@ const CreateEvent = () => {
               >
                 <option value="">Select a category</option>
                 {categories.map((cat) => (
-                 <option key={cat._id} value={cat._id}>
-                 {cat.name}
-               </option>
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
                 ))}
               </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-4">
               <Form.Label>Event Image</Form.Label>
-              <Form.Control type="file" onChange={handleImageChange} />
+              <Form.Control
+                type="file"
+                onChange={handleImageChange}
+                accept="image/*"
+                required
+              />
             </Form.Group>
 
             <h5 className="mb-3">Ticket Types</h5>
             {eventData.ticketTypes.map((ticket, index) => (
               <Card key={index} className="mb-3 bg-secondary text-light p-3">
-                <Row>
+                <Row className="align-items-end">
                   <Col md={4}>
                     <Form.Group>
-                      <Form.Label>Type</Form.Label>
+                      <Form.Label>Ticket Type</Form.Label>
                       <Form.Control
                         name="type"
                         value={ticket.type}
                         onChange={(e) => handleTicketChange(index, e)}
+                        placeholder="Ticket Type"
                         required
                       />
                     </Form.Group>
                   </Col>
-                  <Col md={4}>
+                  <Col md={3}>
                     <Form.Group>
-                      <Form.Label>Price</Form.Label>
+                      <Form.Label>Price (DT)</Form.Label>
                       <Form.Control
                         type="number"
                         name="price"
                         value={ticket.price}
                         onChange={(e) => handleTicketChange(index, e)}
+                        placeholder="0"
+                        min="0"
+                        step="1"
                         required
                       />
                     </Form.Group>
                   </Col>
-                  <Col md={4}>
+                  <Col md={3}>
                     <Form.Group>
-                      <Form.Label>Quantity</Form.Label>
+                      <Form.Label>Total Quantity</Form.Label>
                       <Form.Control
                         type="number"
-                        name="quantity"
-                        value={ticket.quantity}
+                        name="initialQuantity"
+                        value={ticket.initialQuantity}
                         onChange={(e) => handleTicketChange(index, e)}
+                        placeholder="0"
+                        min="0"
                         required
                       />
                     </Form.Group>
+                  </Col>
+                  <Col md={2} className="text-end">
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => removeTicketType(index)}
+                      disabled={eventData.ticketTypes.length <= 1}
+                    >
+                      ×
+                    </Button>
                   </Col>
                 </Row>
               </Card>
             ))}
-
             <div className="d-flex justify-content-between align-items-center mb-4">
               <Button variant="outline-info" onClick={addTicketType}>
                 + Add Ticket Type
               </Button>
-              <span>
-                <strong>Total Tickets:</strong> {calculateAvailableTickets()}
-              </span>
+              <div className="text-end">
+                <strong>Total Event Capacity:</strong> {calculateTotalTickets()}
+              </div>
             </div>
 
             <div className="d-grid">
               <Button variant="primary" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create Event"}
+                {isSubmitting ? "Creating Event..." : "Create Event"}
               </Button>
             </div>
           </Form>

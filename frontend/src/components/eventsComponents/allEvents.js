@@ -88,7 +88,6 @@ const GetAllEvents = () => {
     const matchesCategory = selectedCategory
       ? event.category?.name === selectedCategory
       : true;
-
     return matchesSearch && matchesCategory;
   });
 
@@ -106,13 +105,44 @@ const GetAllEvents = () => {
 
       {/* Search and Filter */}
       <div style={searchContainerStyles}>
-        <input
-          type="text"
-          placeholder={`Search by ${searchBy}`}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={inputStyles}
-        />
+        <div style={{ position: "relative", flex: 1, minWidth: "220px" }}>
+          {searchBy === "date" ? (
+            <input
+              type="date"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ ...inputStyles, width: "100%", paddingRight: "30px" }}
+            />
+          ) : (
+            <input
+              type="text"
+              placeholder={`Search by ${searchBy}`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ ...inputStyles, width: "100%", paddingRight: "30px" }}
+            />
+          )}
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              style={{
+                position: "absolute",
+                right: "10px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "transparent",
+                border: "none",
+                fontSize: "30px",
+                color: "black",
+                cursor: "pointer",
+                padding: "0",
+              }}
+            >
+              ×
+            </button>
+          )}
+        </div>
+
         <select
           value={searchBy}
           onChange={(e) => setSearchBy(e.target.value)}
@@ -123,6 +153,45 @@ const GetAllEvents = () => {
           <option value="location">Location</option>
           <option value="date">Date</option>
         </select>
+
+        {/* Category Dropdown */}
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          style={selectStyles}
+        >
+          <option value="">All Categories</option>
+          {categories?.map((cat) => (
+            <option key={cat._id} value={cat.name}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "20px",
+        }}
+      >
+        <button
+          onClick={() => navigate("/admin/createEvent")}
+          style={{
+            backgroundColor: "#10b981",
+            color: "#ffffff",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "600",
+            transition: "background-color 0.3s ease",
+          }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#059669")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#10b981")}
+        >
+          ➕ Add an Event
+        </button>
       </div>
 
       {/* Delete Selected Button */}
@@ -131,12 +200,8 @@ const GetAllEvents = () => {
           onClick={handleBulkDelete}
           style={deleteButtonStyles}
           disabled={selectedEvents.length === 0}
-          onMouseOver={(e) =>
-            (e.target.style.backgroundColor = "#991b1b")
-          }
-          onMouseOut={(e) =>
-            (e.target.style.backgroundColor = "#dc2626")
-          }
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#991b1b")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#dc2626")}
         >
           🗑 Delete Selected ({selectedEvents.length})
         </button>
@@ -180,8 +245,15 @@ const GetAllEvents = () => {
                   <td style={cellStyle}>{index + 1}</td>
                   <td style={cellStyle}>{event.title}</td>
                   <td style={cellStyle}>
-                    {new Date(event.date).toLocaleDateString()}
+                    {new Date(event.date).toLocaleString("en-GB", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </td>
+
                   <td style={{ ...cellStyle, maxWidth: "150px" }}>
                     {event.description}
                   </td>
@@ -189,19 +261,7 @@ const GetAllEvents = () => {
                   <td style={cellStyle}>{event.category?.name}</td>
                   <td style={cellStyle}>
                     <button
-                      style={{
-                        backgroundColor: "#2563eb",
-                        color: "#ffffff",
-                        border: "none",
-                        borderRadius: "6px",
-                        padding: "8px 16px",
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        cursor: "pointer",
-                        marginRight: "8px",
-                        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-                        transition: "background-color 0.3s ease",
-                      }}
+                      style={viewBtnStyle}
                       onMouseOver={(e) =>
                         (e.target.style.backgroundColor = "#1e40af")
                       }
@@ -213,24 +273,12 @@ const GetAllEvents = () => {
                       View
                     </button>
                     <button
-                      style={{
-                        backgroundColor: "#f59e0b", // Tailwind green-500
-                        color: "#ffffff",
-                        border: "none",
-                        borderRadius: "8px",
-                        padding: "10px 18px",
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        marginRight: "8px",
-                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                        transition: "background-color 0.3s ease",
-                      }}
-                      onMouseOver={
-                        (e) => (e.target.style.backgroundColor = "#b45309") // Tailwind green-600
+                      style={editBtnStyle}
+                      onMouseOver={(e) =>
+                        (e.target.style.backgroundColor = "#b45309")
                       }
-                      onMouseOut={
-                        (e) => (e.target.style.backgroundColor = "#f59e0b") // Tailwind green-500
+                      onMouseOut={(e) =>
+                        (e.target.style.backgroundColor = "#f59e0b")
                       }
                       onClick={() =>
                         navigate(`/admin/update-event/${event._id}`)
@@ -238,20 +286,8 @@ const GetAllEvents = () => {
                     >
                       Edit
                     </button>
-
                     <button
-                      style={{
-                        backgroundColor: "#dc2626",
-                        color: "#ffffff",
-                        border: "none",
-                        borderRadius: "6px",
-                        padding: "8px 16px",
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        cursor: "pointer",
-                        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-                        transition: "background-color 0.3s ease",
-                      }}
+                      style={deleteSingleBtnStyle}
                       onMouseOver={(e) =>
                         (e.target.style.backgroundColor = "#991b1b")
                       }
@@ -279,12 +315,13 @@ const GetAllEvents = () => {
   );
 };
 
+// Styles
 const containerStyles = {
-  background: "#ffffff", // White background for the container
-  minHeight: "100vh", // Full page height
+  background: "#ffffff",
+  minHeight: "100vh",
   padding: "30px",
   fontFamily: "'Inter', sans-serif",
-  color: "#333", // Dark text on white
+  color: "#333",
 };
 
 const headerStyles = {
@@ -324,7 +361,7 @@ const deleteButtonContainerStyles = {
 };
 
 const deleteButtonStyles = {
-  backgroundColor: "#ff4d4d",
+  backgroundColor: "#dc2626",
   color: "#fff",
   border: "none",
   padding: "10px 20px",
@@ -334,7 +371,7 @@ const deleteButtonStyles = {
 };
 
 const tableHeaderStyles = {
-  backgroundColor: "#f1f1f1", // Lighter background for header
+  backgroundColor: "#f1f1f1",
 };
 
 const loadingStyles = {
@@ -349,16 +386,6 @@ const errorStyles = {
   padding: "20px",
 };
 
-const actionBtnStyle = (color) => ({
-  backgroundColor: "transparent",
-  color: "#333",
-  border: `2px solid ${color}`,
-  borderRadius: "4px",
-  padding: "6px 12px",
-  marginRight: "6px",
-  fontSize: "14px",
-  cursor: "pointer",
-});
 const cellStyle = {
   textAlign: "center",
   verticalAlign: "middle",
@@ -366,6 +393,47 @@ const cellStyle = {
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
+};
+
+const viewBtnStyle = {
+  backgroundColor: "#2563eb",
+  color: "#ffffff",
+  border: "none",
+  borderRadius: "6px",
+  padding: "8px 16px",
+  fontSize: "14px",
+  fontWeight: "500",
+  cursor: "pointer",
+  marginRight: "8px",
+  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+  transition: "background-color 0.3s ease",
+};
+
+const editBtnStyle = {
+  backgroundColor: "#f59e0b",
+  color: "#ffffff",
+  border: "none",
+  borderRadius: "8px",
+  padding: "10px 18px",
+  fontSize: "14px",
+  fontWeight: "600",
+  cursor: "pointer",
+  marginRight: "8px",
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+  transition: "background-color 0.3s ease",
+};
+
+const deleteSingleBtnStyle = {
+  backgroundColor: "#dc2626",
+  color: "#ffffff",
+  border: "none",
+  borderRadius: "6px",
+  padding: "8px 16px",
+  fontSize: "14px",
+  fontWeight: "500",
+  cursor: "pointer",
+  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+  transition: "background-color 0.3s ease",
 };
 
 export default GetAllEvents;

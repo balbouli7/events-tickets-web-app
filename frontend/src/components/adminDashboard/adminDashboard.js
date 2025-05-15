@@ -2,12 +2,18 @@ import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
 import { AuthContext } from '../../context.js/authContext';
+import { CartContext } from '../../context.js/cartContext';
+import { OrdersContext } from '../../context.js/orderContext';
 
 const AdminDashboard = () => {
   const { logout, user } = useContext(AuthContext);
+  const { cartItems, clearCart } = useContext(CartContext);
+  const { orders ,refreshOrders  } = useContext(OrdersContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    sessionStorage.removeItem('cartItems');
+    clearCart();
     logout();
     navigate('/login');
   };
@@ -49,7 +55,7 @@ const AdminDashboard = () => {
             { label: 'Home', path: '/admin/home' },
             { label: 'Users', path: '/admin/users' },
             { label: 'Events', path: '/admin/events' },
-            { label: 'Orders', path: '/admin/orders' },
+            { label: 'Tickets', path: '/admin/tickets' },
             { label: 'Settings', path: '/admin/settings' },
           ].map(({ label, path }) => (
             <Link
@@ -83,20 +89,41 @@ const AdminDashboard = () => {
       <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
         {user ? (
           <>
-            <Link
-              to="/cart"
-              style={{
-                color: '#D3D3D3',
-                fontSize: '22px',
-                textDecoration: 'none',
-                transition: 'color 0.3s ease',
-              }}
-              onMouseOver={(e) => (e.target.style.color = '#FFD700')}
-              onMouseOut={(e) => (e.target.style.color = '#D3D3D3')}
-            >
-              <FaShoppingCart />
-            </Link>
+            {/* Orders Icon with Badge */}
+            <div style={{ position: 'relative' }}>
+              <Link
+                to="/admin/myOrders"
+                style={{
+                  color: '#D3D3D3',
+                  fontSize: '22px',
+                  textDecoration: 'none',
+                  transition: 'color 0.3s ease',
+                }}
+                onMouseOver={(e) => (e.target.style.color = '#FFD700')}
+                onMouseOut={(e) => (e.target.style.color = '#D3D3D3')}
+              >
+                <FaShoppingCart />
+              </Link>
+              {orders.length > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '-5px',
+                    right: '-10px',
+                    backgroundColor: '#E94560',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    padding: '2px 6px',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {orders.length}
+                </span>
+              )}
+            </div>
 
+            {/* Logout Button */}
             <button
               onClick={handleLogout}
               style={{

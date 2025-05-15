@@ -1,4 +1,4 @@
-// src/components/UserProfile.jsx
+// src/components/UserProfile
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getUserProfile } from "../api/userServices";

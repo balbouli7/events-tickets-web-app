@@ -1,4 +1,4 @@
-// src/layouts/AdminLayout.jsx
+// src/layouts/AdminLayout.
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminDashboard from './adminDashboard';

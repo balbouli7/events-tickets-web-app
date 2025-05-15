@@ -39,6 +39,8 @@ const UpdateEvent = ({ initialData, token }) => {
                 type: t.type || "",
                 price: t.price || 0,
                 quantity: t.quantity || 0,
+                // Ensure initialQuantity is set properly - use quantity if initialQuantity doesn't exist
+                initialQuantity: t.initialQuantity || t.quantity || 0,
               })) || [],
             image: null,
           });
@@ -81,7 +83,8 @@ const UpdateEvent = ({ initialData, token }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { title, description, date, location, category, ticketTypes } = formData;
+    const { title, description, date, location, category, ticketTypes, image } =
+      formData;
 
     if (!title || !description || !date || !location || !category) {
       setMessage("Please fill in all required fields.");
@@ -90,15 +93,39 @@ const UpdateEvent = ({ initialData, token }) => {
 
     for (const ticket of ticketTypes) {
       if (!ticket.type || ticket.price <= 0 || ticket.quantity <= 0) {
-        setMessage("Each ticket must have a type, price > 0, and quantity > 0.");
+        setMessage(
+          "Each ticket must have a type, price > 0, and quantity > 0."
+        );
         return;
       }
     }
 
     try {
       setLoading(true);
-      const res = await updateEvent(id, formData, token);
-      setMessage(res.message);
+      const updatedData = new FormData();
+      updatedData.append("title", formData.title);
+      updatedData.append("description", formData.description);
+      updatedData.append("date", formData.date);
+      updatedData.append("location", formData.location);
+      updatedData.append("category", formData.category);
+
+      // Prepare ticket types - send both quantity and initialQuantity
+      const ticketData = formData.ticketTypes.map((ticket) => ({
+        type: ticket.type,
+        price: ticket.price,
+        quantity: ticket.quantity,
+        initialQuantity: ticket.initialQuantity,
+      }));
+
+      // Stringify the ticket data properly
+      updatedData.append("ticketTypes", JSON.stringify(ticketData));
+
+      if (formData.image) {
+        updatedData.append("image", formData.image);
+      }
+
+      const res = await updateEvent(id, updatedData, token);
+      setMessage(res.message || "Event updated");
       navigate("/admin/events");
     } catch (err) {
       setMessage(err.message || "Update failed");
@@ -197,15 +224,21 @@ const UpdateEvent = ({ initialData, token }) => {
           <input
             type="number"
             placeholder="Quantity"
-            value={ticket.quantity === 0 ? "" : ticket.quantity}
+            value={ticket.quantity <= 0 ? "" : ticket.quantity}
             onChange={(e) => {
               const updated = [...formData.ticketTypes];
-              updated[index].quantity = Number(e.target.value);
+              const newQty = Number(e.target.value) || 0; // Ensure we don't get NaN
+              updated[index].quantity = newQty;
+              // Maintain initialQuantity if it's not set
+              if (!updated[index].initialQuantity) {
+                updated[index].initialQuantity = newQty;
+              }
               setFormData((prev) => ({ ...prev, ticketTypes: updated }));
             }}
             min="1"
             required
           />
+
           <button
             type="button"
             onClick={() =>
@@ -226,7 +259,15 @@ const UpdateEvent = ({ initialData, token }) => {
         onClick={() =>
           setFormData((prev) => ({
             ...prev,
-            ticketTypes: [...prev.ticketTypes, { type: "", price: 0, quantity: 0 }],
+            ticketTypes: [
+              ...prev.ticketTypes,
+              {
+                type: "",
+                price: 0,
+                quantity: 0,
+                initialQuantity: 0, // Make sure both are set
+              },
+            ],
           }))
         }
         style={styles.addBtn}
@@ -273,9 +314,9 @@ const UpdateEvent = ({ initialData, token }) => {
         <button
           type="button"
           onClick={() => navigate("/admin/events")}
-          style={styles.cancelBtn}
+          style={styles.cancelBtnBottom}
         >
-          Cancel
+          ⬅ Cancel
         </button>
       </div>
 
@@ -286,7 +327,7 @@ const UpdateEvent = ({ initialData, token }) => {
           cursor: pointer;
         }
         .preview-image:hover {
-          transform: scale(3.1);
+          transform: scale(2.1);
         }
       `}</style>
     </form>
@@ -296,60 +337,78 @@ const UpdateEvent = ({ initialData, token }) => {
 const styles = {
   form: {
     margin: "auto",
-    padding: "30px",
-    maxWidth: "700px",
-    borderRadius: "12px",
-    boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
-    backgroundColor: "#fefefe",
-    fontFamily: "Segoe UI, sans-serif",
+    padding: "40px",
+    maxWidth: "1020px",
+    borderRadius: "16px",
+    backgroundColor: "#ffffff",
+    boxShadow: "0 12px 40px rgba(0, 0, 0, 0.08)",
+    fontFamily: "'Segoe UI', sans-serif",
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
   },
   heading: {
     textAlign: "center",
-    marginBottom: "20px",
-    fontSize: "24px",
-    color: "#333",
-  },
-  subheading: {
-    marginTop: "30px",
-    marginBottom: "10px",
+    fontSize: "28px",
     fontWeight: "600",
+    color: "#1e1e2f",
+    marginBottom: "10px",
+  },
+  message: {
+    color: "#e74c3c",
+    backgroundColor: "#fceae9",
+    padding: "12px",
+    borderRadius: "8px",
+    textAlign: "center",
   },
   input: {
     width: "100%",
-    padding: "12px",
-    marginBottom: "15px",
+    padding: "14px",
+    fontSize: "16px",
     borderRadius: "10px",
     border: "1px solid #ccc",
-    fontSize: "16px",
+    outlineColor: "#20c997",
+    backgroundColor: "#fafafa",
+  },
+  subheading: {
+    fontSize: "18px",
+    fontWeight: "600",
+    color: "#2c3e50",
+    marginTop: "20px",
+    marginBottom: "10px",
   },
   ticketRow: {
     display: "flex",
-    gap: "10px",
+    gap: "12px",
     alignItems: "center",
-    marginBottom: "10px",
+    flexWrap: "wrap",
   },
   ticketInput: {
     flex: "1",
-    padding: "10px",
+    padding: "12px",
+    fontSize: "15px",
     borderRadius: "8px",
     border: "1px solid #ccc",
+    backgroundColor: "#fdfdfd",
   },
   addBtn: {
-    padding: "10px 16px",
-    backgroundColor: "#007bff",
+    padding: "10px 18px",
+    backgroundColor: "#20c997",
     color: "#fff",
     border: "none",
     borderRadius: "8px",
+    fontWeight: "bold",
     cursor: "pointer",
-    marginBottom: "20px",
+    alignSelf: "flex-start",
   },
   removeBtn: {
-    padding: "6px 12px",
-    backgroundColor: "#dc3545",
+    backgroundColor: "#e74c3c",
     color: "#fff",
     border: "none",
+    padding: "8px 12px",
     borderRadius: "6px",
     cursor: "pointer",
+    fontWeight: "bold",
   },
   image: {
     width: "100%",
@@ -358,54 +417,52 @@ const styles = {
     marginBottom: "10px",
   },
   label: {
+    fontWeight: "600",
+    marginBottom: "6px",
     display: "block",
-    fontWeight: "bold",
-    marginBottom: "5px",
-    fontSize: "16px",
-  },
-  buttonRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginTop: "20px",
-  },
-  submitBtn: {
-    padding: "12px 24px",
-    backgroundColor: "#28a745",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-  cancelBtn: {
-    padding: "12px 24px",
-    backgroundColor: "#6c757d",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-  message: {
-    color: "#dc3545",
-    marginBottom: "15px",
-    textAlign: "center",
-    fontWeight: "500",
+    color: "#2c3e50",
   },
   uploadLabel: {
     display: "inline-block",
-    padding: "10px 16px",
-    backgroundColor: "#17a2b8",
+    padding: "10px 18px",
+    backgroundColor: "#6f42c1",
     color: "#fff",
     borderRadius: "8px",
     cursor: "pointer",
     fontWeight: "bold",
     marginTop: "10px",
     transition: "background-color 0.3s ease",
-    textAlign: "center",
   },
   hiddenFileInput: {
     display: "none",
+  },
+  buttonRow: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "10px",
+    marginTop: "30px",
+  },
+  submitBtn: {
+    padding: "12px 26px",
+    backgroundColor: "#28a745",
+    color: "#fff",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "16px",
+    fontWeight: "bold",
+    cursor: "pointer",
+  },
+  cancelBtnBottom: {
+    marginTop: "40px",
+    alignSelf: "center",
+    backgroundColor: "#ED0800",
+    color: "white",
+    border: "none",
+    padding: "12px 24px",
+    borderRadius: "10px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    fontSize: "15px",
   },
 };
 

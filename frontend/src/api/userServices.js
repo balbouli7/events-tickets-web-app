@@ -190,47 +190,24 @@ export const getEventById = async (id) => {
   }
 };
 //update event
-export const updateEvent = async (id, eventData, token) => {
+export const updateEvent = async (id, formData, token) => {
   try {
-    const storedToken = token || sessionStorage.getItem("token");
-    if (!storedToken) {
-      throw new Error("No authentication token found");
-    }
-
-    const formData = new FormData();
-    formData.append("title", eventData.title);
-    formData.append("description", eventData.description);
-    formData.append("date", eventData.date);
-    formData.append("location", eventData.location);
-    formData.append("category", eventData.category);
-
-    if (eventData.image) {
-      formData.append("image", eventData.image);
-    }
-
-    // Stringify ticketTypes array to avoid FormData issues
-    formData.append("ticketTypes", JSON.stringify(eventData.ticketTypes));
-
     const response = await axios.put(
       `${API_URL}/admin/update-event/${id}`,
       formData,
       {
         headers: {
-          Authorization: `Bearer ${storedToken}`,
-          "Content-Type": "multipart/form-data",
-        },
+          ...getAuthHeader(token),
+          'Content-Type': 'multipart/form-data'
+        }
       }
     );
-
     return response.data;
   } catch (error) {
-    console.error('Update error:', error);
-    throw error.response?.data || { 
-      message: error.message || "Update failed",
-      error: error.toString()
-    };
+    throw error.response?.data || error;
   }
 };
+
 
 
 //delete event
@@ -241,7 +218,7 @@ export const deleteEvent = async (id) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error deleting user:", error);
+    console.error("Error deleting event:", error);
     throw error;
   }
 };
@@ -275,4 +252,124 @@ export const getAllCategories = async (token) => {
   } catch (error) {
     throw error.response ? error.response.data : { message: "Network error" };
   }
+};
+
+// create order
+export const createOrder = async (orderData, token) => {
+  try {
+    const res = await axios.post(`${API_URL}/createOrder`, orderData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },    });
+
+    return res.data; // Return response data if successful
+  } catch (error) {
+    console.error("Error creating order:", error);
+    throw new Error(error.response?.data?.message || "Something went wrong while placing the order.");
+  }
+};
+
+// getorder by id
+export const getOrderById = async (orderId, token) => {
+  const res = await axios.get(`${API_URL}/orders/${orderId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
+
+// getUserOrders
+export const getUserOrders = async (token) => {
+  const res = await axios.get(`${API_URL}/userOrder`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
+
+// get all orders (Admin route)
+export const getAllOrders = async (token) => {
+  const res = await axios.get(`${API_URL}/admin/orders`, {
+    headers: 
+      getAuthHeader(),
+    },
+  );
+  return res.data;
+};
+//delete order
+export const deleteOrder = async (id) => {
+  try {
+    const response = await axios.delete(`${API_URL}/deleteOrders/${id}`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    throw error;
+  }
+};
+//buytickets
+export const buyTicket = async (orderId, paymentMethod, token) => {
+  const res = await axios.post(
+    `${API_URL}/buyTicket`,
+    { orderId, paymentMethod },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+};
+
+export const getUserTickets = async (token) => {
+  const res = await axios.get(`${API_URL}/userTicket`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
+
+export const getQRCode = (orderId, token) => {
+  return `${API_URL}/qrcode/${orderId}?token=${token}`; // Embed token in query if you handle it like that
+};
+
+
+export const initiateStripePayment = async (orderId, paymentMethod, token) => {
+  const res = await axios.post(
+    `${API_URL}/initiate-payment`,
+    { orderId, paymentMethod },
+    {
+      headers: 
+      getAuthHeader(),
+    }
+  );
+  return res.data;
+};
+
+export const verifyStripePayment = async (orderId, status, token) => {
+  const res = await axios.post(
+    `${API_URL}/verify-payment`,
+    { orderId, status },
+    {
+      headers: 
+      getAuthHeader(),
+    }
+  );
+  return res.data;
+};
+
+export const refundStripePayment = async (orderId, token) => {
+  const res = await axios.post(
+    `${API_URL}/refund-payment`,
+    { orderId },
+    {
+      headers: 
+      getAuthHeader(),
+    }
+  );
+  return res.data;
 };
