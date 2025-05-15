@@ -78,8 +78,26 @@ exports.getAllOrders = async (req, res) => {
       return res.status(403).json({ message: 'Unauthorized access' })
     }
 
-    const orders = await Order.find().populate('user', 'firstName lastName email')
-    res.status(200).json(orders)
+    const orders = await Order.find()
+    .populate('user', 'firstName lastName email')
+    .populate('event');  // This will populate the event field as well
+      res.status(200).json(orders)
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// delete event
+exports.deleteOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' })
+    }
+
+    await order.deleteOne()
+    res.status(200).json({ message: 'Order deleted successfully' })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }

@@ -15,9 +15,8 @@ exports.createEvent = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Parse ticketTypes if it's passed as a string (it should be an array)
+    // Parse ticketTypes
     let parsedTicketTypes;
-
     if (typeof ticketTypes === 'string') {
       try {
         parsedTicketTypes = JSON.parse(ticketTypes);
@@ -29,11 +28,23 @@ exports.createEvent = async (req, res) => {
     } else {
       return res.status(400).json({ message: 'ticketTypes must be an array or a valid JSON string' });
     }
-    // Calculate availableTickets from the ticketTypes array
-    const availableTickets = parsedTicketTypes.reduce((sum, t) => sum + Number(t.quantity), 0);
 
-    // Handle image upload (optional)
-    let eventImageUrl = "/uploads/default-event.png";  // Default image if none is provided
+    // Validate ticket types
+    parsedTicketTypes = parsedTicketTypes.map(ticket => {
+      return {
+        type: ticket.type,
+        price: ticket.price,
+        quantity: ticket.initialQuantity, // Use initialQuantity as quantity
+        initialQuantity: ticket.initialQuantity // Keep initialQuantity
+      };
+    });
+
+    // Calculate totals
+    const totalTickets = parsedTicketTypes.reduce((sum, t) => sum + Number(t.initialQuantity), 0);
+    const availableTickets = totalTickets;
+
+    // Handle image upload
+    let eventImageUrl = "/uploads/default-event.png";
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "events_images",
@@ -41,23 +52,28 @@ exports.createEvent = async (req, res) => {
       eventImageUrl = result.secure_url;
     }
 
-    // Create a new event with the uploaded image or default image URL
+    // Create new event
     const newEvent = new Event({
       title,
       description,
       date,
       location,
       category,
-      ticketTypes: parsedTicketTypes,  // Use parsed ticketTypes
-      availableTickets,  // Added availableTickets calculation
-      image: eventImageUrl,  // Use the event image URL (either default or uploaded)
+      ticketTypes: parsedTicketTypes,
+      totalTickets,
+      availableTickets,
+      image: eventImageUrl,
     });
 
     await newEvent.save();
-
     res.status(201).json({ message: 'Event created successfully', event: newEvent });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Error creating event:", error);
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
@@ -98,13 +114,43 @@ exports.updateEvent = async (req, res) => {
       return res.status(403).json({ message: 'Unauthorized' });
     }
 
-    const { title, description, date, location, category, ticketTypes } = req.body;
+    let { title, description, date, location, category, ticketTypes } = req.body;
 
-    // Handle image upload to Cloudinary
-    if (req.file) {
-      // Delete previous Cloudinary image if it exists and is not the default one
+    // Parse and validate ticketTypes
+       let parsedTicketTypes;
+    if (req.body.ticketTypes) {
+      parsedTicketTypes = typeof req.body.ticketTypes === 'string' 
+        ? JSON.parse(req.body.ticketTypes) 
+        : req.body.ticketTypes;
+
+      // Update ticket quantities while maintaining sold tickets
+      parsedTicketTypes = parsedTicketTypes.map(newTicket => {
+        const existingTicket = event.ticketTypes.find(t => t.type === newTicket.type);
+        
+        if (existingTicket) {
+          // For existing tickets, keep the same quantity if not provided
+          return {
+            type: newTicket.type,
+            price: newTicket.price,
+            quantity: newTicket.quantity !== undefined ? newTicket.quantity : existingTicket.quantity,
+            initialQuantity: newTicket.initialQuantity !== undefined ? newTicket.initialQuantity : existingTicket.initialQuantity
+          };
+        }
+        
+        // For new ticket types
+        return {
+          type: newTicket.type,
+          price: newTicket.price,
+          quantity: newTicket.quantity || newTicket.initialQuantity,
+          initialQuantity: newTicket.initialQuantity
+        };
+      });
+    }
+    // Handle image upload
+    if (req.file?.path) {
+      // Delete previous Cloudinary image if not default
       if (event.image && !event.image.includes("default-event.png")) {
-        const publicId = event.image.split("/").pop().split(".")[0]; // extract Cloudinary public ID
+        const publicId = event.image.split("/").pop().split(".")[0];
         try {
           await cloudinary.uploader.destroy(`events_images/${publicId}`);
         } catch (err) {
@@ -112,46 +158,52 @@ exports.updateEvent = async (req, res) => {
         }
       }
 
-      // Upload new image to Cloudinary
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "events_images",
-      });
-      event.image = result.secure_url;
+      try {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: "events_images",
+        });
+        event.image = result.secure_url;
+      } catch (err) {
+        console.error("Cloudinary upload error:", err);
+        return res.status(500).json({ message: 'Image upload failed' });
+      }
 
-      // Optional: delete local uploaded file after upload
-      fs.unlink(req.file.path, (err) => {
+      // Delete local temp file
+      fs.unlink(req.file.path, err => {
         if (err) console.error("Failed to delete local temp file:", err);
       });
     }
 
-    // Update other fields
+    // Update event fields
     event.title = title || event.title;
     event.description = description || event.description;
     event.date = date || event.date;
     event.location = location || event.location;
     event.category = category || event.category;
 
-    // Handle ticketTypes
-    if (ticketTypes) {
-      try {
-        const parsedTicketTypes = typeof ticketTypes === 'string' 
-          ? JSON.parse(ticketTypes) 
-          : ticketTypes;
-        event.ticketTypes = parsedTicketTypes;
-      } catch (err) {
-        console.error('Error parsing ticketTypes:', err);
-        return res.status(400).json({ message: 'Invalid ticketTypes format' });
-      }
+    // Update ticket types if provided
+    if (parsedTicketTypes) {
+      event.ticketTypes = parsedTicketTypes;
+
+
+      // Recalculate totals
+      event.totalTickets = parsedTicketTypes.reduce(
+        (sum, ticket) => sum + Number(ticket.initialQuantity),
+        0
+      );
+      event.availableTickets = parsedTicketTypes.reduce(
+        (sum, ticket) => sum + Number(ticket.quantity),
+        0
+      );
     }
 
     await event.save();
     res.status(200).json({ message: 'Event updated successfully', event });
   } catch (error) {
     console.error('Update error:', error);
-    res.status(500).json({ 
-      message: 'Server error', 
-      error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    res.status(500).json({
+      message: 'Server error',
+      error: error.message
     });
   }
 };
