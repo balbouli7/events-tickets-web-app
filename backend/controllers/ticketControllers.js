@@ -1,5 +1,6 @@
 const Order = require('../models/order')
 const QRCode = require('qrcode')
+const { Readable } = require("stream");
 
 exports.buyTicket = async (req, res) => {
   try {
@@ -60,55 +61,59 @@ exports.getUserTickets = async (req, res) => {
 exports.generateQRCode = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
-      .populate('event', 'title date location')
-      .populate('user', 'firstName lastName email');
+      .populate("event", "title date location")
+      .populate("user", "firstName lastName email");
 
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ message: "Order not found" });
     }
 
-    // Verify the order is paid before generating QR code
-    if (order.paymentStatus !== 'paid') {
-      return res.status(403).json({ 
-        message: 'QR code not available - payment not completed' 
-      });
+    if (order.paymentStatus !== "paid") {
+      return res.status(403).json({ message: "QR code not available - payment not completed" });
     }
 
-    const qrData = {
-      orderId: order._id,
-      event: {
-        title: order.event.title,
-        date: order.event.date,
-        location: order.event.location,
-      },
-      user: {
-        name: `${order.user.firstName} ${order.user.lastName}`,
-        email: order.user.email,
-      },
-      tickets: order.tickets.map(ticket => ({
-        ticketId: ticket._id,  // Include the individual ticket ID
-        type: ticket.ticketType,
-        quantity: ticket.quantity,
-      })),
-      totalAmount: order.totalAmount,
-      purchaseDate: order.createdAt,
-      verified: true
-    };
+    // Generate one QR per individual ticket
+    const qrCodes = [];
 
-    // Set response headers
-    res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Content-Disposition', `inline; filename=ticket-${order._id}.png`);
+    order.tickets.forEach((ticket, ticketIndex) => {
+      for (let i = 0; i < ticket.quantity; i++) {
+        const uniqueTicketId = `${order._id}-${ticketIndex}-${i}`; // pseudo ticket ID
 
-    // Generate QR code with error correction
-    QRCode.toFileStream(res, JSON.stringify(qrData), {
-      errorCorrectionLevel: 'H',
-      width: 300,
-      margin: 2,
-      color: {
-        dark: '#000000',
-        light: '#ffffff'
+        const qrData = {
+          ticketId: uniqueTicketId,
+          orderId: order._id,
+          event: {
+            title: order.event.title,
+            date: order.event.date,
+            location: order.event.location,
+          },
+          user: {
+            name: `${order.user.firstName} ${order.user.lastName}`,
+            email: order.user.email,
+          },
+          ticketType: ticket.ticketType,
+          totalAmount: order.totalAmount,
+          purchaseDate: order.createdAt,
+          verified: true,
+        };
+
+        qrCodes.push(qrData);
       }
     });
+
+    // Generate QR codes as base64
+    const base64QrCodes = await Promise.all(
+      qrCodes.map(data =>
+        QRCode.toDataURL(JSON.stringify(data), {
+          errorCorrectionLevel: "H",
+          width: 300,
+          margin: 2,
+          color: { dark: "#000000", light: "#ffffff" },
+        })
+      )
+    );
+
+    return res.json({ qrCodes: base64QrCodes });
 
   } catch (err) {
     console.error(err);
