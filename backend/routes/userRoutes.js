@@ -28,7 +28,7 @@ router.get('/orders/:id',verifyToken, getOrderById)
 router.delete('/deleteOrders/:id',verifyToken, deleteOrder) 
 router.post('/buyTicket',verifyToken, buyTicket)
 router.get('/userTicket',verifyToken, getUserTickets) 
-router.get('/qrcode/:id',verifyToken, generateQRCode) 
+router.get('/tickets/qrcode/:id',verifyToken, generateQRCode) 
 router.get('/allCategory', verifyToken,getAllCategories); 
 router.get('/category/:id',verifyToken, getCategoryById); 
 router.post('/initiate-payment',verifyToken, initiatePayment);

@@ -56,34 +56,62 @@ exports.getUserTickets = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
 }
+
 exports.generateQRCode = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
       .populate('event', 'title date location')
-      .populate('user', 'firstName lastName email')
+      .populate('user', 'firstName lastName email');
 
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' })
+      return res.status(404).json({ message: 'Order not found' });
     }
 
-    // if (order.user._id.toString() !== req.user.id && req.user.role !== 'admin') {
-    //   return res.status(403).json({ message: 'Unauthorized access' })
-    // }
+    // Verify the order is paid before generating QR code
+    if (order.paymentStatus !== 'paid') {
+      return res.status(403).json({ 
+        message: 'QR code not available - payment not completed' 
+      });
+    }
 
     const qrData = {
       orderId: order._id,
-      event: order.event.title,
-      date: order.event.date,
-      user: `${order.user.firstName} ${order.user.lastName}`,
+      event: {
+        title: order.event.title,
+        date: order.event.date,
+        location: order.event.location,
+      },
+      user: {
+        name: `${order.user.firstName} ${order.user.lastName}`,
+        email: order.user.email,
+      },
       tickets: order.tickets.map(ticket => ({
-        id: ticket._id,
+        ticketId: ticket._id,  // Include the individual ticket ID
         type: ticket.ticketType,
-      }))
-    
-    }
-    res.setHeader('Content-Type', 'image/png')
-    QRCode.toFileStream(res, JSON.stringify(qrData))
-    } catch (err) {
-      return res.status(500).json({ error: err.message })
-    }
-}
+        quantity: ticket.quantity,
+      })),
+      totalAmount: order.totalAmount,
+      purchaseDate: order.createdAt,
+      verified: true
+    };
+
+    // Set response headers
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Disposition', `inline; filename=ticket-${order._id}.png`);
+
+    // Generate QR code with error correction
+    QRCode.toFileStream(res, JSON.stringify(qrData), {
+      errorCorrectionLevel: 'H',
+      width: 300,
+      margin: 2,
+      color: {
+        dark: '#000000',
+        light: '#ffffff'
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
+  }
+};

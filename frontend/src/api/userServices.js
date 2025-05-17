@@ -1,5 +1,5 @@
 import axios from "axios";
-const API_URL = "http://localhost:5000/api";
+export const API_URL = "http://localhost:5000/api";
 
 // Helper function to get auth token
 const getAuthHeader = () => {
@@ -332,10 +332,27 @@ export const getUserTickets = async (token) => {
   });
   return res.data;
 };
+// src/services/ticketService.js
 
-export const getQRCode = (orderId, token) => {
-  return `${API_URL}/qrcode/${orderId}?token=${token}`; // Embed token in query if you handle it like that
+
+
+// Get QR code for an order
+export const getQRCode = async (orderId, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      responseType: 'blob' // Important for receiving binary data
+    }
+  };
+
+  try {
+    const response = await axios.get(`${API_URL}/tickets/qrcode/${orderId}`, config);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to generate QR code');
+  }
 };
+
 
 
 export const initiateStripePayment = async (orderId, paymentMethod, token) => {
@@ -343,8 +360,7 @@ export const initiateStripePayment = async (orderId, paymentMethod, token) => {
     `${API_URL}/initiate-payment`,
     { orderId, paymentMethod },
     {
-      headers: 
-      getAuthHeader(),
+      headers: getAuthHeader(token),
     }
   );
   return res.data;
@@ -355,8 +371,7 @@ export const verifyStripePayment = async (orderId, status, token) => {
     `${API_URL}/verify-payment`,
     { orderId, status },
     {
-      headers: 
-      getAuthHeader(),
+      headers: getAuthHeader(token),
     }
   );
   return res.data;

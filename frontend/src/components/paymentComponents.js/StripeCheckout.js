@@ -85,15 +85,13 @@ const StripeForm = ({ orderId }) => {
     setMessage(null);
 
     try {
-      const { error: submitError, paymentIntent } = await stripe.confirmPayment(
-        {
-          elements,
-          confirmParams: {
-            return_url: window.location.origin + "/payment-success",
-          },
-          redirect: "if_required",
-        }
-      );
+      const { error: submitError, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: window.location.origin + "/payment-success",
+        },
+        redirect: "if_required",
+      });
 
       if (submitError) {
         await verifyStripePayment(orderId, "failed", token);
@@ -101,25 +99,26 @@ const StripeForm = ({ orderId }) => {
         return;
       }
 
-      if (paymentIntent.status === "succeeded") {
-        await verifyStripePayment(orderId, "succeeded", token);
+      // In your handleSubmit function (StripeCheckout.js)
+// In your handleSubmit function (StripeCheckout.js)
+if (paymentIntent.status === "succeeded") {
+  const verificationResponse = await verifyStripePayment(
+    orderId, 
+    "succeeded", 
+    token
+  );
 
-        // Clear session storage
-        setCartItems((prevItems) => prevItems.filter(item => item.id !== orderId));
+  sessionStorage.removeItem("selectedTickets");
+  sessionStorage.removeItem("selectedEvent");
+  await refreshOrders();
 
-        sessionStorage.removeItem("selectedTickets");
-        sessionStorage.removeItem("selectedEvent");
-        try {
-          await deleteOrder(orderId, token);
-          await refreshOrders()
-
-          console.log("Order deleted after payment.");
-        } catch (err) {
-          console.error("Failed to delete order after payment", err);
-        }
-
-        navigate("/admin/events");
-      }
+  // Navigate to ticket page with the ticket data
+  navigate(`/admin/tickets/${orderId}`, {
+    state: { 
+      ticketData: verificationResponse.ticket 
+    }
+  });
+}
     } catch (error) {
       setMessage(`Error: ${error.message}`);
     } finally {

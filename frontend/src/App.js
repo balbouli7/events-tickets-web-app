@@ -26,6 +26,8 @@ import MyOrders from "./components/orderComponents/myOrders";
 import StripeCheckout from "./components/paymentComponents.js/StripeCheckout";
 import { CartProvider } from "./context.js/cartContext";
 import { OrdersProvider } from "./context.js/orderContext";
+import QRCodeDisplay from "./components/ticketComponents/QRCodeDisplay";
+import TicketDisplay from "./components/ticketComponents/QRCodeDisplay";
 
 function App() {
   const [userEmail, setUserEmail] = useState("");
@@ -66,7 +68,7 @@ function App() {
             <Route path="MyOrders" element={<MyOrders />} />
             <Route path="checkout/:eventId" element={<CheckoutForm />} />
             <Route path="payment/:orderId" element={<StripeCheckout />} />
-
+            <Route path="tickets/:orderId" element={<TicketDisplay />} />
             {/* More admin routes */}
           </Route>
 
