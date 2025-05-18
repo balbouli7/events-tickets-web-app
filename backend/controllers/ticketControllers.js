@@ -95,6 +95,7 @@ exports.generateQRCode = async (req, res) => {
           totalAmount: order.totalAmount,
           purchaseDate: order.createdAt,
           verified: true,
+          
         };
 
         qrCodes.push(qrData);

@@ -64,7 +64,7 @@ exports.getOrderById = async (req, res) => {
 // Get all orders for a specific user
 exports.getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user.id }).populate('event', 'title date location')
+    const orders = await Order.find({ user: req.user.id, isDeleted: false }).populate('event', 'title date location')
     res.status(200).json(orders)
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
@@ -90,15 +90,18 @@ exports.getAllOrders = async (req, res) => {
 // delete event
 exports.deleteOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id)
+    const order = await Order.findById(req.params.id);
 
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' })
+      return res.status(404).json({ message: 'Order not found' });
     }
 
-    await order.deleteOne()
-    res.status(200).json({ message: 'Order deleted successfully' })
+    order.isDeleted = true;
+    await order.save();
+
+    res.status(200).json({ message: 'Order hidden successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message })
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
-}
+};
+

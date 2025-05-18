@@ -28,6 +28,7 @@ import { CartProvider } from "./context.js/cartContext";
 import { OrdersProvider } from "./context.js/orderContext";
 import QRCodeDisplay from "./components/ticketComponents/QRCodeDisplay";
 import TicketDisplay from "./components/ticketComponents/QRCodeDisplay";
+import UserTickets from "./components/ticketComponents/userTickets";
 
 function App() {
   const [userEmail, setUserEmail] = useState("");
@@ -69,6 +70,7 @@ function App() {
             <Route path="checkout/:eventId" element={<CheckoutForm />} />
             <Route path="payment/:orderId" element={<StripeCheckout />} />
             <Route path="tickets/:orderId" element={<TicketDisplay />} />
+            <Route path="tickets" element={<UserTickets />} />
             {/* More admin routes */}
           </Route>
 

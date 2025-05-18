@@ -1,146 +1,162 @@
 // TicketDisplay.js
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { deleteOrder } from "../../api/userServices";
+import { OrdersContext } from "../../context.js/orderContext";
 
 const styles = {
   container: {
-    maxWidth: "800px",
+    maxWidth: "1000px",
     margin: "3rem auto",
-    padding: "3rem",
-    backgroundColor: "#ffffff",
-    borderRadius: "12px",
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-    color: "#2d3748",
+    padding: "2rem",
+    background: "#0f172a", // Dark navy
+    borderRadius: "20px",
+    boxShadow: "0 20px 50px rgba(0,0,0,0.6)",
+    color: "#f1f5f9",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },
   header: {
     textAlign: "center",
-    marginBottom: "2.5rem",
-    color: "#1a365d",
-    fontSize: "2rem",
-    fontWeight: "600",
-    letterSpacing: "-0.5px",
+    marginBottom: "2rem",
+    fontSize: "2.5rem",
+    fontWeight: "bold",
+    color: "#38bdf8", // Neon blue
   },
   ticketInfo: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
     gap: "1.5rem",
     marginBottom: "3rem",
-    padding: "2rem",
-    backgroundColor: "#f8fafc",
-    borderRadius: "10px",
-    borderLeft: "4px solid #4f46e5",
   },
   infoItem: {
-    marginBottom: "1rem",
-    lineHeight: "1.6",
-    fontSize: "1rem",
+    background: "rgba(255, 255, 255, 0.05)",
+    padding: "1.5rem",
+    borderRadius: "16px",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    backdropFilter: "blur(10px)",
+    boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
   },
   label: {
-    fontWeight: "600",
-    color: "#4f46e5",
-    marginRight: "0.5rem",
-    display: "inline-block",
-    minWidth: "100px",
+    display: "block",
+    fontSize: "0.9rem",
+    color: "#94a3b8",
+    marginBottom: "0.25rem",
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
   },
   qrContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+    textAlign: "center",
     margin: "3rem 0",
+    padding: "2rem",
+    background: "rgba(255, 255, 255, 0.05)",
+    borderRadius: "20px",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    backdropFilter: "blur(8px)",
   },
   qrImage: {
-    width: "300px",
-    height: "300px",
-    border: "1px solid #e2e8f0",
-    padding: "1.5rem",
-    backgroundColor: "#fff",
-    borderRadius: "8px",
-    boxShadow: "0 2px 15px rgba(0, 0, 0, 0.03)",
+    width: "280px",
+    height: "280px",
+    objectFit: "cover",
+    borderRadius: "12px",
+    boxShadow: "0 0 15px rgba(56, 189, 248, 0.4)",
+    border: "3px solid #38bdf8",
+  },
+  qrCaption: {
+    marginTop: "1rem",
+    color: "#cbd5e1",
+    fontSize: "0.9rem",
+    fontStyle: "italic",
   },
   ticketList: {
-    listStyleType: "none",
     padding: 0,
-    margin: "0.5rem 0 0 0",
+    margin: "0.5rem 0",
+    listStyle: "none",
   },
   ticketItem: {
     padding: "0.5rem 0",
-    borderBottom: "1px solid #edf2f7",
+    borderBottom: "1px solid rgba(255,255,255,0.1)",
+    fontSize: "1rem",
   },
   lastTicketItem: {
     padding: "0.5rem 0",
-    borderBottom: "none",
+    fontSize: "1rem",
   },
   noData: {
     textAlign: "center",
     padding: "2rem",
-    color: "#718096",
-    fontSize: "1.1rem",
-  },
-  qrCaption: {
-    marginTop: "1.5rem",
-    color: "#718096",
-    fontSize: "0.9rem",
-    textAlign: "center",
-    fontStyle: "italic",
+    color: "#64748b",
+    fontSize: "1.2rem",
   },
   buttonContainer: {
     display: "flex",
     justifyContent: "center",
-    marginTop: "2rem",
+    marginTop: "3rem",
   },
   backButton: {
-    padding: "0.75rem 1.5rem",
-    backgroundColor: "#4f46e5",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
+    backgroundColor: "#9333ea", // Neon purple
+    color: "#fff",
+    padding: "0.75rem 2rem",
     fontSize: "1rem",
-    fontWeight: "500",
+    fontWeight: "600",
+    border: "none",
+    borderRadius: "12px",
     cursor: "pointer",
-    transition: "all 0.2s ease",
-    ":hover": {
-      backgroundColor: "#4338ca",
-      transform: "translateY(-1px)",
-      boxShadow: "0 2px 10px rgba(79, 70, 229, 0.3)",
-    },
-    ":active": {
-      transform: "translateY(0)",
-    },
+    transition: "0.3s ease",
+    boxShadow: "0 0 10px #9333ea, 0 0 20px #9333ea inset",
   },
   emoji: {
     marginRight: "0.5rem",
   },
 };
 
+
+
+
 const TicketDisplay = () => {
   const { orderId } = useParams();
-  const { state } = useLocation();
   const navigate = useNavigate();
-  const [qrCodeUrl, setQrCodeUrl] = useState(null);
+  const [ticketData, setTicketData] = useState(null);
   const [qrCodes, setQrCodes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { refreshOrders } = useContext(OrdersContext);
+  
 
-  const ticketData = state?.ticketData;
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
-    const fetchQrCodes = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/api/tickets/qrcode/${orderId}`,
-          {
+        const [ticketRes, qrRes] = await Promise.all([
+          axios.get(`http://localhost:5000/api/orders/${orderId}`, {
             headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setQrCodes(response.data.qrCodes); // array of base64 images
+          }),
+          axios.get(`http://localhost:5000/api/tickets/qrcode/${orderId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+  
+        setTicketData(ticketRes.data);
+        setQrCodes(qrRes.data.qrCodes);
+        
+        // Now delete the order
+        await deleteOrder(orderId);
+        await refreshOrders();
+
       } catch (err) {
-        console.error("Failed to load QR codes", err);
+        console.error("Error fetching data or deleting order:", err);
+        setError("Failed to load ticket or QR code data.");
+      } finally {
+        setLoading(false);
       }
     };
-
-    fetchQrCodes();
+  
+    fetchData();
   }, [orderId, token]);
+  
+
 
   const handleBackToEvents = () => {
     navigate("/admin/events");
@@ -153,7 +169,7 @@ const TicketDisplay = () => {
   return (
     <div style={styles.container}>
       <h2 style={styles.header}>
-        <span style={styles.emoji}>🎟️</span> Ticket Confirmation
+        <span style={styles.emoji}>🎟️</span> YOUR TICKET
       </h2>
 
       <div style={styles.ticketInfo}>
