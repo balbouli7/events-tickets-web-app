@@ -1,23 +1,24 @@
-import { useEffect, useState } from "react";
-import { getUserTickets } from "../../api/userServices";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context.js/authContext";
 import { useNavigate } from "react-router-dom";
+import { getAllTickets } from "../../api/userServices";
 
-const UserTickets = () => {
+const AllTickets = () => {
   const [tickets, setTickets] = useState([]);
+  const { token } = useContext(AuthContext);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("event");
   const [dateValue, setDateValue] = useState("");
+  
   const navigate = useNavigate();
-
-  const token = sessionStorage.getItem("token");
 
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const data = await getUserTickets(token);
+        const data = await getAllTickets(token);
         // Sort by purchase date (newest first)
         const sorted = data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -85,7 +86,6 @@ const UserTickets = () => {
       </div>
     );
   }
-
   return (
     <div className="tickets-container">
       <h2>Your Tickets</h2>
@@ -267,5 +267,4 @@ const UserTickets = () => {
     </div>
   );
 };
-
-export default UserTickets;
+export default AllTickets;

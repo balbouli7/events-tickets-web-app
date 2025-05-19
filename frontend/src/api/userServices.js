@@ -332,8 +332,15 @@ export const getUserTickets = async (token) => {
   });
   return res.data;
 };
-
-
+//get all tickets (Admin route)
+export const getAllTickets = async (token) => {
+  const res = await axios.get(`${API_URL}/admin/allTickets`, {
+    headers: 
+      getAuthHeader(),
+    },
+  );
+  return res.data;
+};
 
 // Get QR code for an order
 export const getQRCode = async (orderId, token) => {

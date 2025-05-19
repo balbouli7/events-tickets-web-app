@@ -6,7 +6,7 @@ const { getUserProfile, updateUserProfile, deleteUserAccount, getUserById } = re
 const { getAllUsers, deleteUser} = require("../controllers/adminControllers")
 const { createEvent, updateEvent, deleteEvent, getAllEvents, getEventById } = require("../controllers/eventControllers")
 const { createOrder, getUserOrders, getOrderById, getAllOrders, deleteOrder } = require("../controllers/orderControllers")
-const { buyTicket, generateQRCode, getUserTickets } = require("../controllers/ticketControllers")
+const { buyTicket, generateQRCode, getUserTickets, getAllTickets } = require("../controllers/ticketControllers")
 const { createCategory, updateCategory, deleteCategory, getAllCategories, getCategoryById } = require("../controllers/categoryControllers")
 const { initiatePayment, verifyPayment, refundPayment, stripeWebhook } = require("../controllers/paymentControllers")
 const router=express.Router()
@@ -47,5 +47,6 @@ router.delete('/admin/delete-event/:id',verifyToken,authorizedRoles("admin"), de
 router.post('/admin/createCategory',verifyToken,authorizedRoles("admin"),createCategory)
 router.put('/admin/updateCategory/:id',verifyToken,authorizedRoles("admin"), updateCategory)
 router.delete('/admin/deleteCategory/:id',verifyToken,authorizedRoles("admin"), deleteCategory)
+router.get('/admin/allTickets',verifyToken,authorizedRoles("admin"), getAllTickets)
 
 module.exports=router

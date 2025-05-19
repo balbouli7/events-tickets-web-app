@@ -50,9 +50,24 @@ exports.getUserTickets = async (req, res) => {
   try {
     const tickets = await Order.find({ user: req.user.id, paymentStatus: 'paid' })
       .populate('event', 'title date location')
-      .select('tickets event')
+      .select('tickets event createdAt ')
 
     res.status(200).json(tickets)
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+exports.getAllTickets = async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Unauthorized access' })
+    }
+
+    const tickets = await Order.find()
+    .populate('event', 'title date location')
+    .select('tickets event createdAt ')
+      res.status(200).json(tickets)
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }

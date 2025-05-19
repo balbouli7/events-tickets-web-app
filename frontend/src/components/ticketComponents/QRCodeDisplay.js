@@ -111,9 +111,6 @@ const styles = {
   },
 };
 
-
-
-
 const TicketDisplay = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
@@ -122,7 +119,6 @@ const TicketDisplay = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { refreshOrders } = useContext(OrdersContext);
-  
 
   const token = sessionStorage.getItem("token");
 
@@ -137,14 +133,13 @@ const TicketDisplay = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-  
+
         setTicketData(ticketRes.data);
         setQrCodes(qrRes.data.qrCodes);
-        
+
         // Now delete the order
         await deleteOrder(orderId);
         await refreshOrders();
-
       } catch (err) {
         console.error("Error fetching data or deleting order:", err);
         setError("Failed to load ticket or QR code data.");
@@ -152,14 +147,12 @@ const TicketDisplay = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [orderId, token]);
-  
-
 
   const handleBackToEvents = () => {
-    navigate("/admin/events");
+    navigate("/admin/tickets");
   };
 
   if (!ticketData) {
@@ -185,7 +178,8 @@ const TicketDisplay = () => {
           {ticketData.event.location}
         </div>
         <div style={styles.infoItem}>
-          <span style={styles.label}>Name:</span> {ticketData.user.name}
+          <span style={styles.label}>Name:</span>{" "}
+          {ticketData.user.firstName + " " + ticketData.user.lastName}
         </div>
         <div style={styles.infoItem}>
           <span style={styles.label}>Email:</span> {ticketData.user.email}
@@ -196,7 +190,7 @@ const TicketDisplay = () => {
         </div>
         <div style={styles.infoItem}>
           <span style={styles.label}>Purchased At:</span>{" "}
-          {new Date(ticketData.purchaseDate).toLocaleString()}
+          {new Date(ticketData.createdAt).toLocaleString()}
         </div>
         <div style={styles.infoItem}>
           <span style={styles.label}>Tickets:</span>
@@ -216,14 +210,25 @@ const TicketDisplay = () => {
           </ul>
         </div>
       </div>
-
       <div style={styles.qrContainer}>
         {qrCodes.length > 0 &&
           qrCodes.map((src, idx) => (
             <div
               key={idx}
-              style={{ marginBottom: "2rem", textAlign: "center" }}
+              style={{
+                marginBottom: "10rem",
+                textAlign: "center",
+              }}
             >
+              <h3
+                style={{
+                  color: "#38bdf8",
+                  marginBottom: "0.5rem",
+                  fontSize: "1.2rem",
+                }}
+              >
+                {ticketData.tickets[idx]?.ticketType || `Ticket #${idx + 1}`}
+              </h3>
               <img
                 src={src}
                 alt={`QR Code ${idx + 1}`}
@@ -238,7 +243,7 @@ const TicketDisplay = () => {
 
       <div style={styles.buttonContainer}>
         <button onClick={handleBackToEvents} style={styles.backButton}>
-          Back to Events
+          Back
         </button>
       </div>
     </div>
