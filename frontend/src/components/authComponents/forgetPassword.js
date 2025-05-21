@@ -21,7 +21,6 @@ const ForgetPassword = () => {
   return (
     <div
       style={{
-        backgroundImage: 'url(https://img.freepik.com/free-photo/interior-clothing-store-with-stylish-merchandise-racks-fashionable-brand-design-casual-wear-modern-boutique-empty-fashion-showroom-shopping-centre-with-elegant-merchandise_482257-65537.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         minHeight: '100vh',
@@ -57,7 +56,7 @@ const ForgetPassword = () => {
             fontSize: "28px",
             fontWeight: "700",
             letterSpacing: "-0.5px",
-            color: 'wheat'
+            color: 'black'
           }}
         >
           Forgot Password

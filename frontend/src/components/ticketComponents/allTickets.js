@@ -12,7 +12,7 @@ const AllTickets = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("event");
   const [dateValue, setDateValue] = useState("");
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,8 +47,8 @@ const AllTickets = () => {
   const handleTextSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    
-    const filtered = tickets.filter(ticket =>
+
+    const filtered = tickets.filter((ticket) =>
       ticket.event.title.toLowerCase().includes(term)
     );
     setFilteredTickets(filtered);
@@ -57,17 +57,19 @@ const AllTickets = () => {
   const handleDateSearch = (e) => {
     const date = e.target.value;
     setDateValue(date);
-    
+
     if (!date) {
       setFilteredTickets(tickets);
       return;
     }
 
-    const filtered = tickets.filter(ticket => {
-      const ticketDate = new Date(ticket.event.date).toISOString().split('T')[0];
+    const filtered = tickets.filter((ticket) => {
+      const ticketDate = new Date(ticket.event.date)
+        .toISOString()
+        .split("T")[0];
       return ticketDate === date;
     });
-    
+
     setFilteredTickets(filtered);
   };
 
@@ -87,72 +89,87 @@ const AllTickets = () => {
     );
   }
   return (
-    <div className="tickets-container">
-      <h2>Your Tickets</h2>
+    <div>
+      <button
+        className="myTicketsBtn"
+        onClick={() => navigate("/admin/myTickets")}
+      >
+        My Tickets
+      </button>
+      <div className="tickets-container">
+        <h2>All Tickets</h2>
 
-      <div className="search-controls">
-        <select 
-          value={searchType} 
-          onChange={handleSearchTypeChange}
-          className="search-type-select"
-        >
-          <option value="event">Search by Event</option>
-          <option value="date">Search by Date</option>
-        </select>
+        <div className="search-controls">
+          <select
+            value={searchType}
+            onChange={handleSearchTypeChange}
+            className="search-type-select"
+          >
+            <option value="event">Search by Event</option>
+            <option value="date">Search by Date</option>
+          </select>
 
-        {searchType === "event" ? (
-          <input
-            type="text"
-            placeholder="Search by event name..."
-            value={searchTerm}
-            onChange={handleTextSearch}
-            className="search-input"
-          />
+          {searchType === "event" ? (
+            <input
+              type="text"
+              placeholder="Search by event name..."
+              value={searchTerm}
+              onChange={handleTextSearch}
+              className="search-input"
+            />
+          ) : (
+            <input
+              type="date"
+              value={dateValue}
+              onChange={handleDateSearch}
+              className="date-input"
+            />
+          )}
+        </div>
+
+        {filteredTickets.length === 0 ? (
+          <p className="no-tickets">No matching tickets found.</p>
         ) : (
-          <input
-            type="date"
-            value={dateValue}
-            onChange={handleDateSearch}
-            className="date-input"
-          />
-        )}
-      </div>
+          filteredTickets.map((ticket) => (
+            <div key={ticket._id} className="ticket-card">
+              <h3>{ticket.event.title}</h3>
 
-      {filteredTickets.length === 0 ? (
-        <p className="no-tickets">No matching tickets found.</p>
-      ) : (
-        filteredTickets.map((ticket) => (
-          <div key={ticket._id} className="ticket-card">
-            <h3>{ticket.event.title}</h3>
-            
-            <p><strong>Date:</strong> {new Date(ticket.event.date).toLocaleString()}</p>
-            
-            <p><strong>Location:</strong> {ticket.event.location}</p>
-            
-            <div className="ticket-types">
-              <strong>Tickets:</strong>
-              <ul>
-                {ticket.tickets.map((t, index) => (
-                  <li key={index}>
-                    {t.ticketType} – Quantity: {t.quantity}
-                  </li>
-                ))}
-              </ul>
+              <p>
+                <strong>Date:</strong>{" "}
+                {new Date(ticket.event.date).toLocaleString()}
+              </p>
+
+              <p>
+                <strong>Location:</strong> {ticket.event.location}
+              </p>
+
+              <div className="ticket-types">
+                <strong>Tickets:</strong>
+                <ul>
+                  {ticket.tickets.map((t, index) => (
+                    <li key={index}>
+                      {t.ticketType} – Quantity: {t.quantity}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <p>
+                <strong>Purchased On:</strong>{" "}
+                {new Date(ticket.createdAt).toLocaleString()}
+              </p>
+
+              <button
+                onClick={() => navigate(`/admin/tickets/${ticket._id}`)}
+                className="view-button"
+              >
+                View Details
+              </button>
             </div>
-            
-            <p><strong>Purchased On:</strong> {new Date(ticket.createdAt).toLocaleString()}</p>
-            
-            <button
-              onClick={() => navigate(`/admin/tickets/${ticket._id}`)}
-              className="view-button"
-            >
-              View Details
-            </button>
-          </div>
-        ))
-      )}
+          ))
+        )}
 
-      <style>{`
+        <style>{`
         .tickets-container {
           max-width: 1100px;
           margin: 2rem auto;
@@ -257,13 +274,40 @@ const AllTickets = () => {
           color: #bdc3c7;
         }
 
+.myTicketsBtn {
+  display: inline-block;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  background-color: #28a745;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.myTicketsBtn:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+.myTicketsBtn:active {
+  background-color: #1e7e34;
+  transform: translateY(0);
+}
+
         @media (max-width: 600px) {
           .search-controls {
             flex-direction: column;
             align-items: center;
           }
         }
+
       `}</style>
+      </div>
     </div>
   );
 };

@@ -109,6 +109,20 @@ const styles = {
   emoji: {
     marginRight: "0.5rem",
   },
+  imageContainer: {
+    position: "relative",
+    width: "100%",
+    height: "400px",
+    borderRadius: "12px",
+    overflow: "hidden",
+    marginBottom: "30px",
+    boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)",
+  },
+  eventImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
 };
 
 const TicketDisplay = () => {
@@ -133,7 +147,7 @@ const TicketDisplay = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-
+        console.log("ticketRes.data:", ticketRes.data);
         setTicketData(ticketRes.data);
         setQrCodes(qrRes.data.qrCodes);
 
@@ -161,6 +175,18 @@ const TicketDisplay = () => {
 
   return (
     <div style={styles.container}>
+      <div style={styles.imageContainer}>
+        <img
+          src={ticketData.event.image}
+          alt={ticketData.event.title}
+          style={styles.eventImage}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src =
+              "https://via.placeholder.com/800x400?text=Event+Image";
+          }}
+        />
+      </div>
       <h2 style={styles.header}>
         <span style={styles.emoji}>🎟️</span> YOUR TICKET
       </h2>

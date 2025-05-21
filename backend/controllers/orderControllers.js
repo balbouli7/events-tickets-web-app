@@ -45,7 +45,7 @@ exports.getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
       .populate('user', 'firstName lastName email')
-      .populate('event', 'title date location')
+      .populate('event', 'title date location image')
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' })
