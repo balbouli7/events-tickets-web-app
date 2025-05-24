@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context.js/authContext";
 import { useNavigate } from "react-router-dom";
 import { getAllTickets } from "../../api/userServices";
+import LoadingSpinner from "../../spinner";
 
 const AllTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -48,9 +49,28 @@ const AllTickets = () => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
 
-    const filtered = tickets.filter((ticket) =>
-      ticket.event.title.toLowerCase().includes(term)
-    );
+    if (term === "") {
+      // If search bar is cleared, show all tickets again
+      setFilteredTickets(tickets);
+      return;
+    }
+
+    const filtered = tickets.filter((ticket) => {
+      if (searchType === "event") {
+        return ticket.event.title.toLowerCase().includes(term);
+      }
+      if (searchType === "user") {
+        return (
+          ticket.user?.name?.toLowerCase().includes(term) ||
+          (ticket.user?.firstName &&
+            ticket.user?.firstName.toLowerCase().includes(term)) ||
+          (ticket.user?.lastName &&
+            ticket.user?.lastName.toLowerCase().includes(term))
+        );
+      }
+      return true;
+    });
+
     setFilteredTickets(filtered);
   };
 
@@ -74,11 +94,7 @@ const AllTickets = () => {
   };
 
   if (loading) {
-    return (
-      <div className="loading-container">
-        <p>Loading tickets...</p>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -106,13 +122,21 @@ const AllTickets = () => {
             className="search-type-select"
           >
             <option value="event">Search by Event</option>
+            <option value="user">Search by Name</option>
             <option value="date">Search by Date</option>
           </select>
-
           {searchType === "event" ? (
             <input
               type="text"
               placeholder="Search by event name..."
+              value={searchTerm}
+              onChange={handleTextSearch}
+              className="search-input"
+            />
+          ) : searchType === "user" ? (
+            <input
+              type="text"
+              placeholder="Search by user name..."
               value={searchTerm}
               onChange={handleTextSearch}
               className="search-input"
@@ -133,6 +157,10 @@ const AllTickets = () => {
           filteredTickets.map((ticket) => (
             <div key={ticket._id} className="ticket-card">
               <h3>{ticket.event.title}</h3>
+              <p>
+                <strong>Purchased By:</strong>{" "}
+                {ticket.user.firstName + " " + ticket.user.lastName}
+              </p>
 
               <p>
                 <strong>Date:</strong>{" "}

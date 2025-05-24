@@ -226,3 +226,13 @@ exports.deleteEvent = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
 }
+//event by category
+exports.getEventsByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const events = await Event.find({ category: categoryId }).populate("category");
+    res.status(200).json(events);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch events by category" });
+  }
+};

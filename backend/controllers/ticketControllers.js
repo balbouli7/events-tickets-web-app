@@ -66,6 +66,7 @@ exports.getAllTickets = async (req, res) => {
 
     const tickets = await Order.find()
     .populate('event', 'title date location')
+    .populate("user", "firstName lastName email")
     .select('tickets event createdAt ')
       res.status(200).json(tickets)
   } catch (error) {

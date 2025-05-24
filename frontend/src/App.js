@@ -31,6 +31,7 @@ import TicketDisplay from "./components/ticketComponents/QRCodeDisplay";
 import UserTickets from "./components/ticketComponents/userTickets";
 import AllTickets from "./components/ticketComponents/allTickets";
 import LoadingSpinner from "./spinner";
+import EventsByCategory from "./components/eventsComponents/eventsByCategory";
 
 function App() {
   const [userEmail, setUserEmail] = useState("");
@@ -83,7 +84,7 @@ function App() {
                 <Route path="events" element={<GetAllEvents />} />
                 <Route path="events/:id" element={<EventDetail />} />
                 <Route path="addCategory" element={<AddCategory />} />
-                <Route path="allCategory" element={<AllCategories />} />
+                <Route path="allCategories" element={<AllCategories />} />
                 <Route path="update-event/:id" element={<UpdateEvent />} />
                 <Route path="orders/:id" element={<OrderDetails />} />
                 <Route path="MyOrders" element={<MyOrders />} />
@@ -92,6 +93,8 @@ function App() {
                 <Route path="tickets/:orderId" element={<TicketDisplay />} />
                 <Route path="myTickets" element={<UserTickets />} />
                 <Route path="allTickets" element={<AllTickets/>}/>
+                <Route path="eventsByCategory/:categoryId" element={<EventsByCategory/>} />
+
               </Route>
 
               {/* Default redirect */}

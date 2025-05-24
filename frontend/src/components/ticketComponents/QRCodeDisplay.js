@@ -166,7 +166,7 @@ const TicketDisplay = () => {
   }, [orderId, token]);
 
   const handleBackToEvents = () => {
-    navigate("/admin/tickets");
+    navigate(-1);
   };
 
   if (!ticketData) {

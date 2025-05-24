@@ -55,6 +55,7 @@ const AdminDashboard = () => {
             { label: 'Home', path: '/admin/home' },
             { label: 'Users', path: '/admin/users' },
             { label: 'Events', path: '/admin/events' },
+            { label: 'Category', path: '/admin/allCategories' },
             { label: 'Tickets', path: '/admin/allTickets' },
             { label: 'Settings', path: '/admin/settings' },
           ].map(({ label, path }) => (

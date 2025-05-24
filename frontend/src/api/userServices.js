@@ -208,6 +208,16 @@ export const updateEvent = async (id, formData, token) => {
   }
 };
 
+//event by category
+export const eventsByCategory = async (categoryId) => {
+  try {
+    const res = await axios.get(`${API_URL}/eventsByCategory/${categoryId}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 
 //delete event
@@ -244,9 +254,7 @@ export const createCategory = async (categoryData) => {
 export const getAllCategories = async (token) => {
   try {
     const response = await axios.get(`${API_URL}/allCategory`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: getAuthHeader(),
     });
     return response.data;
   } catch (error) {

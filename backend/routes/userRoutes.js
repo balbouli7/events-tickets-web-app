@@ -4,7 +4,7 @@ const { verifyToken } = require("../middlewares/authMiddleware")
 const { authorizedRoles } = require("../middlewares/roleMiddleware")
 const { getUserProfile, updateUserProfile, deleteUserAccount, getUserById } = require("../controllers/userControllers")
 const { getAllUsers, deleteUser} = require("../controllers/adminControllers")
-const { createEvent, updateEvent, deleteEvent, getAllEvents, getEventById } = require("../controllers/eventControllers")
+const { createEvent, updateEvent, deleteEvent, getAllEvents, getEventById, getEventsByCategory } = require("../controllers/eventControllers")
 const { createOrder, getUserOrders, getOrderById, getAllOrders, deleteOrder } = require("../controllers/orderControllers")
 const { buyTicket, generateQRCode, getUserTickets, getAllTickets } = require("../controllers/ticketControllers")
 const { createCategory, updateCategory, deleteCategory, getAllCategories, getCategoryById } = require("../controllers/categoryControllers")
@@ -35,6 +35,8 @@ router.post('/initiate-payment',verifyToken, initiatePayment);
 router.post('/verify-payment',verifyToken, verifyPayment);
 router.post('/refund-payment',verifyToken, refundPayment);
 router.get('/events/:id',verifyToken,getEventById)
+router.get("/eventsByCategory/:categoryId", getEventsByCategory);
+
 // router.post('/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
 //admin routes
