@@ -113,7 +113,7 @@ if (paymentIntent.status === "succeeded") {
   await refreshOrders();
 
   // Navigate to ticket page with the ticket data
-  navigate(`/admin/tickets/${orderId}`, {
+  navigate(`/tickets/${orderId}`, {
     state: { 
       ticketData: verificationResponse.ticket 
     }

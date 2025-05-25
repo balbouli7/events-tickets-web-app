@@ -146,7 +146,7 @@ const MyOrders = () => {
               </td>
               <td style={styles.td}>
                 <Link
-                  to={`/admin/orders/${order._id}`}
+                  to={`/orders/${order._id}`}
                   style={styles.link}
                   onMouseEnter={(e) =>
                     (e.target.style.backgroundColor = styles.linkHover.backgroundColor)

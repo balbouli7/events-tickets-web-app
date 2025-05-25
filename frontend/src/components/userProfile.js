@@ -88,7 +88,7 @@ const UserProfile = () => {
 
         <div style={{ textAlign: "center", marginTop: "30px" }}>
           <button
-            onClick={() => navigate("/admin/users")}
+            onClick={() => navigate("/users")}
             style={{
               backgroundColor: "#007bff",
               color: "#fff",

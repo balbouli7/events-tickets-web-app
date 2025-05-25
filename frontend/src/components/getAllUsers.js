@@ -164,7 +164,7 @@ const GetAllUsers = () => {
                         (e.target.style.backgroundColor = "#2563eb")
                       }
                       onClick={() =>
-                        navigate(`/admin/users/details/${user._id}`)
+                        navigate(`/users/details/${user._id}`)
                       }
                     >
                       View
@@ -179,7 +179,7 @@ const GetAllUsers = () => {
                         (e.target.style.backgroundColor = "#f59e0b")
                       }
                       onClick={() =>
-                        navigate(`/admin/users/update/${user._id}`)
+                        navigate(`/users/update/${user._id}`)
                       }
                     >
                       Edit

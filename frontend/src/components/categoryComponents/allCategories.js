@@ -12,11 +12,11 @@ const AllCategories = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
 
   const handleCategoryClick = (categoryId) => {
-    navigate(`/admin/eventsByCategory/${categoryId}`);
+    navigate(`/eventsByCategory/${categoryId}`);
   };
 
   const handleAddCategory = () => {
-    navigate("/admin/addCategory");
+    navigate("/addCategory");
   };
 
   return (
@@ -32,6 +32,18 @@ const AllCategories = () => {
       {error && <div style={errorStyle}>{error}</div>}
 
       <ul style={visibleListStyle}>
+        <li
+          style={{
+            ...itemStyle,
+            ...(hoveredItem === "all" ? itemHoverStyle : {}),
+          }}
+          onClick={() => navigate("/events")}
+          onMouseEnter={() => setHoveredItem("all")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          All Categories
+        </li>
+
         {categories.map((cat) => (
           <li
             key={cat._id}
@@ -52,7 +64,6 @@ const AllCategories = () => {
 };
 
 export default AllCategories;
-
 
 // Styles remain the same as before
 

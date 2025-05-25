@@ -21,7 +21,7 @@ export default function Register({ setUserEmail }) {
       useEffect(() => {
         if (isLoggedIn && user) {
           if (user.role === "admin") {
-            navigate("/adminDashboard");
+            navigate("/admin/home");
           } else {
             navigate("/home");
           }
@@ -65,7 +65,7 @@ export default function Register({ setUserEmail }) {
     return (
       <div style={{
         maxWidth: "420px",
-        margin: "80px auto",
+        margin: "auto",
         padding: "40px 30px",
         background: "#fff",
         boxShadow: "0 10px 25px rgba(0, 0, 0, 0.08)",

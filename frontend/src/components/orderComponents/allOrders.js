@@ -100,7 +100,7 @@ const AdminOrderList = () => {
     <div style={styles.container}>
       <h2 style={styles.heading}>All Orders</h2>
 
-      <button style={styles.myOrdersBtn} onClick={() => navigate("/admin/MyOrders")}>
+      <button style={styles.myOrdersBtn} onClick={() => navigate("/MyOrders")}>
         My Orders
       </button>
 
@@ -147,7 +147,7 @@ const AdminOrderList = () => {
               </td>
               <td style={styles.td}>
                 <Link
-                  to={`/admin/orders/${order._id}`}
+                  to={`/orders/${order._id}`}
                   style={styles.link}
                   onMouseEnter={(e) => {
                     e.target.style.backgroundColor =

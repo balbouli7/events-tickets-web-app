@@ -170,7 +170,7 @@ const OrderDetails = () => {
 
       {order.paymentStatus !== 'paid' && (
         <button
-          onClick={() => navigate(`/admin/payment/${order._id}`)}
+          onClick={() => navigate(`/payment/${order._id}`)}
           style={styles.payBtn}
         >
           Pay It

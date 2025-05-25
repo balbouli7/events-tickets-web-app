@@ -1,12 +1,15 @@
 // src/layouts/AdminLayout.
-import React from 'react';
+import React, { useContext } from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminDashboard from './adminDashboard';
+import HomePage from './homePage';
+import { AuthContext } from '../../context.js/authContext';
 
-const AdminLayout = () => {
+const DashboardLayout = () => {
+  const{user}=useContext(AuthContext)
   return (
     <div style={{ backgroundColor: 'white', minHeight: '100vh', color: 'black' }}>
-      <AdminDashboard />
+      {user?.role === 'admin' ? <AdminDashboard /> : <HomePage />}
       <div style={{ paddingTop: '70px' }}>
         <Outlet />
       </div>
@@ -14,4 +17,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout;
+export default DashboardLayout;

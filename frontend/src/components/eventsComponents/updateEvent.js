@@ -126,7 +126,7 @@ const UpdateEvent = ({ initialData, token }) => {
 
       const res = await updateEvent(id, updatedData, token);
       setMessage(res.message || "Event updated");
-      navigate("/admin/events");
+      navigate("/events");
     } catch (err) {
       setMessage(err.message || "Update failed");
     } finally {
@@ -313,7 +313,7 @@ const UpdateEvent = ({ initialData, token }) => {
         </button>
         <button
           type="button"
-          onClick={() => navigate("/admin/events")}
+          onClick={() => navigate("/events")}
           style={styles.cancelBtnBottom}
         >
           ⬅ Cancel

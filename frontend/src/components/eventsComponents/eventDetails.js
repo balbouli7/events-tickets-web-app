@@ -75,7 +75,7 @@ const EventDetail = () => {
 
     sessionStorage.setItem("selectedTickets", JSON.stringify(selected));
     sessionStorage.setItem("selectedEvent", JSON.stringify(updatedEvent));
-    navigate(`/admin/checkout/${event._id}`);
+    navigate(`/checkout/${event._id}`);
   };
 
   if (loading)

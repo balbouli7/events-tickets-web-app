@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getAllEvents, deleteEvent } from "../../api/userServices";
 import { useNavigate } from "react-router-dom";
 import useCategories from "../useCategory";
+import { AuthContext } from "../../context.js/authContext";
 
 const GetAllEvents = () => {
   const [events, setEvents] = useState([]);
@@ -12,6 +13,8 @@ const GetAllEvents = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [hoveredCardId, setHoveredCardId] = useState(null);
+  const { user } = useContext(AuthContext);
+  const isAdmin = user?.role === "admin";
 
   const navigate = useNavigate();
 
@@ -104,7 +107,7 @@ const GetAllEvents = () => {
   return (
     <div style={containerStyles}>
       <h2 style={headerStyles}>Events List</h2>
-  
+
       {/* Search and Filter */}
       <div style={searchContainerStyles}>
         <div style={{ position: "relative", flex: 1, minWidth: "220px" }}>
@@ -144,7 +147,7 @@ const GetAllEvents = () => {
             </button>
           )}
         </div>
-  
+
         <select
           value={searchBy}
           onChange={(e) => setSearchBy(e.target.value)}
@@ -155,7 +158,7 @@ const GetAllEvents = () => {
           <option value="location">Location</option>
           <option value="date">Date</option>
         </select>
-  
+
         {/* Category Dropdown */}
         <select
           value={selectedCategory}
@@ -170,7 +173,7 @@ const GetAllEvents = () => {
           ))}
         </select>
       </div>
-  
+
       <div
         style={{
           display: "flex",
@@ -179,7 +182,7 @@ const GetAllEvents = () => {
         }}
       >
         <button
-          onClick={() => navigate("/admin/createEvent")}
+          onClick={() => navigate("/createEvent")}
           style={{
             backgroundColor: "black",
             color: "#ffffff",
@@ -196,9 +199,9 @@ const GetAllEvents = () => {
           ➕ Add an Event
         </button>
       </div>
-  
+
       {/* Removed Delete Selected Button */}
-  
+
       {/* Cards Grid */}
       <div style={styles.container}>
         {filteredEvents.length > 0 ? (
@@ -217,12 +220,16 @@ const GetAllEvents = () => {
                   }}
                   onMouseEnter={() => setHoveredCardId(event._id)}
                   onMouseLeave={() => setHoveredCardId(null)}
-                  onClick={() => navigate(`/admin/events/${event._id}`)}
+                  onClick={() => navigate(`/events/${event._id}`)}
                 >
                   {/* Checkbox removed */}
-  
+
                   {event.image && (
-                    <img src={event.image} alt={event.title} style={styles.image} />
+                    <img
+                      src={event.image}
+                      alt={event.title}
+                      style={styles.image}
+                    />
                   )}
                   <div style={cardContentStyles}>
                     <h3
@@ -252,35 +259,51 @@ const GetAllEvents = () => {
                         style={viewBtnStyle}
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/admin/events/${event._id}`);
+                          navigate(`/events/${event._id}`);
                         }}
-                        onMouseOver={(e) => (e.target.style.backgroundColor = "#4b4b4d")}
-                        onMouseOut={(e) => (e.target.style.backgroundColor = "black")}
+                        onMouseOver={(e) =>
+                          (e.target.style.backgroundColor = "#4b4b4d")
+                        }
+                        onMouseOut={(e) =>
+                          (e.target.style.backgroundColor = "black")
+                        }
                       >
                         View
                       </button>
-                      <button
-                        style={editBtnStyle}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/admin/update-event/${event._id}`);
-                        }}
-                        onMouseOver={(e) => (e.target.style.backgroundColor = "#f5ce0b")}
-                        onMouseOut={(e) => (e.target.style.backgroundColor = "#f59e0b")}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        style={deleteSingleBtnStyle}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(event._id);
-                        }}
-                        onMouseOver={(e) => (e.target.style.backgroundColor = "#dc5026")}
-                        onMouseOut={(e) => (e.target.style.backgroundColor = "#dc2626")}
-                      >
-                        Delete
-                      </button>
+                      {isAdmin && (
+                        <button
+                          style={editBtnStyle}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/update-event/${event._id}`);
+                          }}
+                          onMouseOver={(e) =>
+                            (e.target.style.backgroundColor = "#f5ce0b")
+                          }
+                          onMouseOut={(e) =>
+                            (e.target.style.backgroundColor = "#f59e0b")
+                          }
+                        >
+                          Edit
+                        </button>
+                      )}
+                      {isAdmin && (
+                        <button
+                          style={deleteSingleBtnStyle}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(event._id);
+                          }}
+                          onMouseOver={(e) =>
+                            (e.target.style.backgroundColor = "#dc5026")
+                          }
+                          onMouseOut={(e) =>
+                            (e.target.style.backgroundColor = "#dc2626")
+                          }
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -293,7 +316,6 @@ const GetAllEvents = () => {
       </div>
     </div>
   );
-  
 };
 
 // Styles

@@ -103,7 +103,7 @@ const CreateEvent = () => {
       }
 
       await createEvent(formData);
-      navigate("/admin/events");
+      navigate("/events");
     } catch (err) {
       console.error("Event creation error:", err);
       setError(err.response?.data?.message || "Failed to create event");
@@ -276,7 +276,7 @@ const CreateEvent = () => {
           <div className="mt-3">
             <Button
               variant="outline-light"
-              onClick={() => navigate("/admin/events")}
+              onClick={() => navigate("/events")}
             >
               ← Back to Events
             </Button>

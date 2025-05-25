@@ -101,7 +101,7 @@ const CheckoutForm = () => {
               Confirm Order
             </button>
             <button
-              onClick={() => navigate(`/admin/events/${event._id}`)}
+              onClick={() => navigate(`/events/${event._id}`)}
               style={styles.secondaryBtn}
             >
               Back
@@ -117,13 +117,13 @@ const CheckoutForm = () => {
             <div style={styles.modalActions}>
               <button
                 style={styles.primaryBtn}
-                onClick={() => navigate(`/admin/payment/${orderId}`)}
+                onClick={() => navigate(`/payment/${orderId}`)}
               >
                 Proceed to Payment
               </button>
               <button
                 style={{ ...styles.secondaryBtn, marginLeft: "10px" }}
-                onClick={() => navigate("/admin/events")}
+                onClick={() => navigate("/events")}
               >
                 Keep Shopping
               </button>

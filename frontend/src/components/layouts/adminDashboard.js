@@ -52,12 +52,12 @@ const AdminDashboard = () => {
       {user && (
         <div style={{ display: 'flex', gap: '28px', alignItems: 'center' }}>
           {[
-            { label: 'Home', path: '/admin/home' },
-            { label: 'Users', path: '/admin/users' },
-            { label: 'Events', path: '/admin/events' },
-            { label: 'Category', path: '/admin/allCategories' },
-            { label: 'Tickets', path: '/admin/allTickets' },
-            { label: 'Settings', path: '/admin/settings' },
+            { label: 'Home', path: '/home' },
+            { label: 'Users', path: '/users' },
+            { label: 'Events', path: '/events' },
+            { label: 'Category', path: '/allCategories' },
+            { label: 'Tickets', path: '/allTickets' },
+            { label: 'Settings', path: '/settings' },
           ].map(({ label, path }) => (
             <Link
               key={label}
@@ -93,7 +93,7 @@ const AdminDashboard = () => {
             {/* Orders Icon with Badge */}
             <div style={{ position: 'relative' }}>
               <Link
-                to="/admin/myOrders"
+                to="/myOrders"
                 style={{
                   color: '#D3D3D3',
                   fontSize: '22px',

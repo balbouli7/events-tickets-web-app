@@ -92,7 +92,7 @@ const UserTickets = () => {
     <div>
       <button
         className="allTicketsBtn"
-        onClick={() => navigate("/admin/allTickets")}
+        onClick={() => navigate("/allTickets")}
       >
         ALL Tickets
       </button>
@@ -160,7 +160,7 @@ const UserTickets = () => {
               </p>
 
               <button
-                onClick={() => navigate(`/admin/tickets/${ticket._id}`)}
+                onClick={() => navigate(`/tickets/${ticket._id}`)}
                 className="view-button"
               >
                 View Details

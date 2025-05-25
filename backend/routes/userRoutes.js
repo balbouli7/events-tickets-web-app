@@ -29,12 +29,12 @@ router.delete('/deleteOrders/:id',verifyToken, deleteOrder)
 router.post('/buyTicket',verifyToken, buyTicket)
 router.get('/userTicket',verifyToken, getUserTickets) 
 router.get('/tickets/qrcode/:id',verifyToken, generateQRCode) 
-router.get('/allCategory', verifyToken,getAllCategories); 
-router.get('/category/:id',verifyToken, getCategoryById); 
+router.get('/allCategory',getAllCategories); 
+router.get('/category/:id', getCategoryById); 
 router.post('/initiate-payment',verifyToken, initiatePayment);
 router.post('/verify-payment',verifyToken, verifyPayment);
 router.post('/refund-payment',verifyToken, refundPayment);
-router.get('/events/:id',verifyToken,getEventById)
+router.get('/events/:id',getEventById)
 router.get("/eventsByCategory/:categoryId", getEventsByCategory);
 
 // router.post('/webhook', express.raw({ type: 'application/json' }), stripeWebhook);

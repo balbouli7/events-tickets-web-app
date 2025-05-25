@@ -18,7 +18,7 @@ export default function Login() {
       if (user.role === "admin") {
         navigate("/admin/home");
       } else {
-        navigate("user/home");
+        navigate("/");
       }
     }
   }, [isLoggedIn, user, navigate]);
@@ -38,7 +38,7 @@ export default function Login() {
       if (data.user.role === "admin") {
         navigate("/admin/home");
       } else {
-        navigate("user/home");
+        navigate("/");
       }
     } catch (err) {
       setError(err.response?.data?.error || "Something went wrong");
