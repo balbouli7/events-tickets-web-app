@@ -52,7 +52,7 @@ const AdminDashboard = () => {
       {user && (
         <div style={{ display: 'flex', gap: '28px', alignItems: 'center' }}>
           {[
-            { label: 'Home', path: '/home' },
+            { label: 'Home', path: '/admin/home' },
             { label: 'Users', path: '/users' },
             { label: 'Events', path: '/events' },
             { label: 'Category', path: '/allCategories' },

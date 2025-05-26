@@ -165,8 +165,8 @@ const TicketDisplay = () => {
     fetchData();
   }, [orderId, token]);
 
-  const handleBackToEvents = () => {
-    navigate(-1);
+  const handleBackToTickets = () => {
+    navigate("/myTickets");
   };
 
   if (!ticketData) {
@@ -268,7 +268,7 @@ const TicketDisplay = () => {
       </div>
 
       <div style={styles.buttonContainer}>
-        <button onClick={handleBackToEvents} style={styles.backButton}>
+        <button onClick={handleBackToTickets} style={styles.backButton}>
           Back
         </button>
       </div>

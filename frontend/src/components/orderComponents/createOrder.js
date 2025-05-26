@@ -3,6 +3,8 @@ import { createOrder } from "../../api/userServices";
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "../../context.js/cartContext";
 import { OrdersContext } from "../../context.js/orderContext";
+import ModalManager from "../modalManager";
+import Login from "../authComponents/login";
 
 const CheckoutForm = () => {
   const [event, setEvent] = useState(null);
@@ -10,6 +12,8 @@ const CheckoutForm = () => {
   const [paymentMethod, setPaymentMethod] = useState("credit_card");
   const [orderId, setOrderId] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showLoginConfirm, setShowLoginConfirm] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const { refreshOrders } = useContext(OrdersContext);
   const { addToCart } = useContext(CartContext);
@@ -50,6 +54,10 @@ const CheckoutForm = () => {
 
     try {
       const token = sessionStorage.getItem("token");
+      if (!token) {
+        setShowLoginConfirm(true);
+        return;
+      }
       const response = await createOrder(orderData, token);
       const newOrder = response.order;
 
@@ -72,7 +80,9 @@ const CheckoutForm = () => {
           <ul style={styles.ticketList}>
             {selectedTickets.map((ticket, i) => (
               <li key={i} style={styles.ticketItem}>
-                {ticket.ticketType} — Quantity: {ticket.quantity} — Price: {ticket.price}DT × {ticket.quantity} = {ticket.price * ticket.quantity}DT
+                {ticket.ticketType} — Quantity: {ticket.quantity} — Price:{" "}
+                {ticket.price}DT × {ticket.quantity} ={" "}
+                {ticket.price * ticket.quantity}DT
               </li>
             ))}
           </ul>
@@ -128,6 +138,28 @@ const CheckoutForm = () => {
                 Keep Shopping
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      <ModalManager
+        showConfirm={showLoginConfirm}
+        onCancel={() => setShowLoginConfirm(false)}
+        onProceed={() => {
+          setShowLoginConfirm(false);
+          setShowLoginModal(true);
+        }}
+      />
+
+      {showLoginModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <Login />
+            <button
+              onClick={() => setShowLoginModal(false)}
+              style={{ marginTop: "10px", ...styles.secondaryBtn }}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

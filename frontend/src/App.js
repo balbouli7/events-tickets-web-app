@@ -58,7 +58,6 @@ function App() {
             <Routes location={currentLocation}>
 
 
-              {/* Admin Nested Routes with Dashboard Layout */}
               <Route path="/" element={<DashboardLayout />}>
                             {/* Auth Routes */}
                 <Route path="register" element={<Register setUserEmail={setUserEmail} />} />

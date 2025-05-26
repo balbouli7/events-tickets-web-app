@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getUserTickets } from "../../api/userServices";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context.js/authContext";
 
 const UserTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -10,6 +11,8 @@ const UserTickets = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("event");
   const [dateValue, setDateValue] = useState("");
+  const { user } = useContext(AuthContext);
+  const isAdmin = user?.role === "admin";
   const navigate = useNavigate();
 
   const token = sessionStorage.getItem("token");
@@ -90,12 +93,11 @@ const UserTickets = () => {
 
   return (
     <div>
-      <button
-        className="allTicketsBtn"
-        onClick={() => navigate("/allTickets")}
-      >
+      {isAdmin && (
+      <button className="allTicketsBtn" onClick={() => navigate("/allTickets")}>
         ALL Tickets
       </button>
+      )}
       <div className="tickets-container">
         <h2>Your Tickets</h2>
 

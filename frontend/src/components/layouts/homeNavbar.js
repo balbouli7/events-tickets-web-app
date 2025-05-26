@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaShoppingCart } from 'react-icons/fa';
+import { FaShoppingCart, FaTicketAlt, FaUser } from 'react-icons/fa';
 import { AuthContext } from '../../context.js/authContext';
 import { CartContext } from '../../context.js/cartContext';
 import { OrdersContext } from '../../context.js/orderContext';
@@ -20,134 +20,381 @@ const HomeNavbar = () => {
 
   return (
     <nav style={navStyle}>
-      <div style={leftStyle}>
-        <Link to="/" style={logoStyle}>MyTickets 🎟</Link>
-      </div>
-
-      <div style={centerStyle}>
-        <Link to="/" style={navLink}>Home</Link>
-        <Link to="/events" style={navLink}>Events</Link>
-        <Link to="/allCategories" style={navLink}>Categories</Link>
-        {user && <Link to="/myTickets" style={navLink}>My Tickets</Link>}
-        {user && <Link to="/settings" style={navLink}>Settings</Link>}
-      </div>
-
-      <div style={rightStyle}>
-        <div style={{ position: 'relative' }}>
-          <Link to="/myOrders" style={iconLink}>
-            <FaShoppingCart />
+      <div style={containerStyle}>
+        {/* Logo Section */}
+        <div style={logoSectionStyle}>
+          <Link 
+            to="/" 
+            style={logoStyle}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = '#1D4ED8';
+              e.currentTarget.querySelector('svg').style.color = '#1D4ED8';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = '#2563EB';
+              e.currentTarget.querySelector('svg').style.color = '#2563EB';
+            }}
+          >
+            <FaTicketAlt style={logoIconStyle} />
+            <span> MyApp</span>
           </Link>
-          {orders.length > 0 && (
-            <span style={badgeStyle}>{orders.length}</span>
+        </div>
+
+        {/* Navigation Links */}
+        <div style={navLinksStyle}>
+          <Link 
+            to="/" 
+            style={navLinkStyle}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = '#2563EB';
+              e.currentTarget.style.backgroundColor = '#F8FAFC';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = '#374151';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            Home
+          </Link>
+          <Link 
+            to="/events" 
+            style={navLinkStyle}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = '#2563EB';
+              e.currentTarget.style.backgroundColor = '#F8FAFC';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = '#374151';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            Events
+          </Link>
+          <Link 
+            to="/allCategories" 
+            style={navLinkStyle}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = '#2563EB';
+              e.currentTarget.style.backgroundColor = '#F8FAFC';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = '#374151';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            Categories
+          </Link>
+          {user && (
+            <Link 
+              to="/myTickets" 
+              style={navLinkStyle}
+              onMouseOver={(e) => {
+                e.currentTarget.style.color = '#2563EB';
+                e.currentTarget.style.backgroundColor = '#F8FAFC';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.color = '#374151';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              My Tickets
+            </Link>
+          )}
+          {user && (
+            <Link 
+              to="/settings" 
+              style={navLinkStyle}
+              onMouseOver={(e) => {
+                e.currentTarget.style.color = '#2563EB';
+                e.currentTarget.style.backgroundColor = '#F8FAFC';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.color = '#374151';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              Settings
+            </Link>
           )}
         </div>
 
-        {user ? (
-          <button onClick={handleLogout} style={logoutButton}>Logout</button>
-        ) : (
-          <>
-            <Link to="/login" style={authButton('#00BFA6', '#00A98F')}>Sign In</Link>
-            <Link to="/register" style={authButton('#007BFF', '#0063CC')}>Sign Up</Link>
-          </>
-        )}
+        {/* Right Section */}
+        <div style={rightSectionStyle}>
+          {/* Cart Icon */}
+          <div style={cartContainerStyle}>
+            <Link 
+              to="/myOrders" 
+              style={cartLinkStyle}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#EFF6FF';
+                e.currentTarget.style.borderColor = '#93C5FD';
+                e.currentTarget.querySelector('svg').style.color = '#2563EB';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = '#F8FAFC';
+                e.currentTarget.style.borderColor = '#E5E7EB';
+                e.currentTarget.querySelector('svg').style.color = '#6B7280';
+              }}
+            >
+              <FaShoppingCart style={cartIconStyle} />
+              {orders.length > 0 && (
+                <span style={cartBadgeStyle}>{orders.length}</span>
+              )}
+            </Link>
+          </div>
+
+          {/* Auth Section */}
+          {user ? (
+            <div style={userSectionStyle}>
+              <div 
+                style={userInfoStyle}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#EFF6FF';
+                  e.currentTarget.style.borderColor = '#93C5FD';
+                  e.currentTarget.querySelector('svg').style.color = '#2563EB';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#F8FAFC';
+                  e.currentTarget.style.borderColor = '#E5E7EB';
+                  e.currentTarget.querySelector('svg').style.color = '#6B7280';
+                }}
+              >
+                <FaUser style={userIconStyle} />
+                <span style={userNameStyle}>Welcome</span>
+              </div>
+              <button 
+                onClick={handleLogout} 
+                style={logoutButtonStyle}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#EF4444';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#F87171';
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div style={authButtonsStyle}>
+              <Link 
+                to="/login" 
+                style={signInButtonStyle}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#F3F4F6';
+                  e.currentTarget.style.borderColor = '#D1D5DB';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#FFFFFF';
+                  e.currentTarget.style.borderColor = '#E5E7EB';
+                }}
+              >
+                Sign In
+              </Link>
+              <Link 
+                to="/register" 
+                style={signUpButtonStyle}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1D4ED8';
+                  e.currentTarget.style.borderColor = '#1D4ED8';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#2563EB';
+                  e.currentTarget.style.borderColor = '#2563EB';
+                }}
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );
 };
 
-// === Styles ===
+// === Modern White Styles ===
 const navStyle = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '14px 30px',
-  background: 'rgba(10, 10, 25, 0.8)',
-  backdropFilter: 'blur(12px)',
+  background: '#FFFFFF',
+  boxShadow: '0 2px 20px rgba(0, 0, 0, 0.08)',
   position: 'sticky',
   top: 0,
   zIndex: 1000,
-  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+  borderBottom: '1px solid #F0F0F0',
 };
 
-const leftStyle = {
-  flex: 1,
+const containerStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  maxWidth: '1200px',
+  margin: '0 auto',
+  padding: '16px 24px',
+};
+
+const logoSectionStyle = {
+  flex: '0 0 auto',
 };
 
 const logoStyle = {
-  color: '#FFFFFF',
-  fontSize: '26px',
-  fontWeight: '700',
-  textDecoration: 'none',
-  fontFamily: 'Poppins, sans-serif',
-};
-
-const centerStyle = {
-  flex: 2,
   display: 'flex',
-  justifyContent: 'center',
-  gap: '26px',
-};
-
-const rightStyle = {
-  flex: 1,
-  display: 'flex',
-  justifyContent: 'flex-end',
   alignItems: 'center',
-  gap: '16px',
+  gap: '10px',
+  textDecoration: 'none',
+  color: '#2563EB',
+  fontSize: '24px',
+  fontWeight: '700',
+  fontFamily: 'Inter, -apple-system, sans-serif',
+  transition: 'all 0.2s ease',
 };
 
-const navLink = {
-  color: '#E0E0E0',
+const logoIconStyle = {
+  fontSize: '28px',
+  color: '#2563EB',
+  transition: 'all 0.2s ease',
+};
+
+const navLinksStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '32px',
+  flex: '1 1 auto',
+  justifyContent: 'center',
+};
+
+const navLinkStyle = {
   textDecoration: 'none',
-  fontSize: '16px',
+  color: '#374151',
+  fontSize: '15px',
   fontWeight: '500',
-  position: 'relative',
-  padding: '6px 10px',
+  padding: '8px 16px',
   borderRadius: '8px',
-  transition: 'all 0.3s ease',
+  transition: 'all 0.2s ease',
+  position: 'relative',
+  fontFamily: 'Inter, -apple-system, sans-serif',
 };
 
-const iconLink = {
-  color: '#CCCCCC',
-  fontSize: '22px',
+const rightSectionStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '20px',
+  flex: '0 0 auto',
+};
+
+const cartContainerStyle = {
+  position: 'relative',
+};
+
+const cartLinkStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '44px',
+  height: '44px',
+  backgroundColor: '#F8FAFC',
+  borderRadius: '12px',
   textDecoration: 'none',
-  transition: 'color 0.3s ease',
+  transition: 'all 0.2s ease',
+  border: '1px solid #E5E7EB',
 };
 
-const badgeStyle = {
+const cartIconStyle = {
+  fontSize: '18px',
+  color: '#6B7280',
+  transition: 'all 0.2s ease',
+};
+
+const cartBadgeStyle = {
   position: 'absolute',
-  top: '-5px',
-  right: '-10px',
-  backgroundColor: '#FF3E55',
-  color: '#fff',
-  borderRadius: '50%',
-  padding: '3px 7px',
-  fontSize: '12px',
-  fontWeight: 'bold',
+  top: '-6px',
+  right: '-6px',
+  backgroundColor: '#EF4444',
+  color: '#FFFFFF',
+  fontSize: '11px',
+  fontWeight: '600',
+  borderRadius: '10px',
+  padding: '2px 6px',
+  minWidth: '18px',
+  height: '18px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  border: '2px solid #FFFFFF',
 };
 
-const logoutButton = {
-  backgroundColor: '#FF3E55',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '20px',
-  padding: '8px 18px',
+const userSectionStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+};
+
+const userInfoStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '8px 12px',
+  backgroundColor: '#F8FAFC',
+  borderRadius: '8px',
+  border: '1px solid #E5E7EB',
+  transition: 'all 0.2s ease',
+};
+
+const userIconStyle = {
   fontSize: '14px',
-  cursor: 'pointer',
-  transition: 'background-color 0.3s ease',
+  color: '#6B7280',
+  transition: 'all 0.2s ease',
 };
 
-const authButton = (bg, hover) => ({
-  color: '#fff',
-  backgroundColor: bg,
+const userNameStyle = {
+  fontSize: '14px',
+  color: '#374151',
+  fontWeight: '500',
+  fontFamily: 'Inter, -apple-system, sans-serif',
+};
+
+const logoutButtonStyle = {
+  backgroundColor: '#F87171',
+  color: '#FFFFFF',
+  border: 'none',
+  borderRadius: '8px',
+  padding: '8px 16px',
+  fontSize: '14px',
+  fontWeight: '500',
+  cursor: 'pointer',
+  transition: 'all 0.2s ease',
+  fontFamily: 'Inter, -apple-system, sans-serif',
+};
+
+const authButtonsStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+};
+
+const signInButtonStyle = {
   textDecoration: 'none',
-  padding: '8px 18px',
-  borderRadius: '20px',
+  color: '#6B7280',
   fontSize: '14px',
-  transition: 'background-color 0.3s ease',
-  border: 'none',
-  cursor: 'pointer',
-  display: 'inline-block',
-});
+  fontWeight: '500',
+  padding: '8px 16px',
+  borderRadius: '8px',
+  transition: 'all 0.2s ease',
+  fontFamily: 'Inter, -apple-system, sans-serif',
+  border: '1px solid #E5E7EB',
+  backgroundColor: '#FFFFFF',
+};
+
+const signUpButtonStyle = {
+  textDecoration: 'none',
+  color: '#FFFFFF',
+  fontSize: '14px',
+  fontWeight: '500',
+  padding: '8px 20px',
+  borderRadius: '8px',
+  backgroundColor: '#2563EB',
+  transition: 'all 0.2s ease',
+  fontFamily: 'Inter, -apple-system, sans-serif',
+  border: '1px solid #2563EB',
+};
 
 export default HomeNavbar;

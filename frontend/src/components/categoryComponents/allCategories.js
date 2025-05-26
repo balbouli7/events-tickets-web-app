@@ -65,76 +65,77 @@ const AllCategories = () => {
 
 export default AllCategories;
 
-// Styles remain the same as before
-
-// New Styles
 
 const cardStyle = {
-  maxWidth: "520px",
+  maxWidth: "500px",
   margin: "60px auto",
   padding: "30px 35px",
-  background: "#f9fafb",
-  boxShadow: "0 6px 18px rgba(100, 100, 111, 0.2)",
-  borderRadius: "16px",
-  fontFamily: "'Inter', sans-serif",
-  color: "#222",
+  background: "#ffffff",
+  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.05)",
+  borderRadius: "18px",
+  fontFamily: "'Poppins', sans-serif",
+  color: "#2c3e50",
 };
 
 const headingStyle = {
   textAlign: "center",
   marginBottom: "30px",
-  fontSize: "28px",
+  fontSize: "30px",
   fontWeight: "700",
-  color: "#1a202c",
+  color: "#2c3e50",
+  letterSpacing: "1.2px",
 };
 
 const errorStyle = {
-  color: "#e53e3e",
+  color: "#e74c3c",
   marginBottom: "16px",
   textAlign: "center",
-  fontWeight: "600",
-  fontSize: "15px",
+  fontWeight: "700",
+  fontSize: "16px",
 };
 
 const visibleListStyle = {
   listStyleType: "none",
-  padding: "15px",
+  padding: "20px",
   margin: 0,
-  borderRadius: "12px",
-  backgroundColor: "#fff",
-  boxShadow: "inset 0 0 10px #d1d5db",
+  borderRadius: "14px",
+  backgroundColor: "#f8f9fa",
+  boxShadow: "inset 1px 1px 3px rgba(0,0,0,0.05)",
 };
 
 const itemStyle = {
-  padding: "14px 18px",
+  padding: "14px 20px",
   marginBottom: "12px",
-  borderRadius: "10px",
-  backgroundColor: "#edf2f7",
-  fontSize: "17px",
-  color: "#2d3748",
+  borderRadius: "12px",
+  backgroundColor: "#ffffff",
+  fontSize: "16px",
+  color: "#2c3e50",
   fontWeight: "500",
-  boxShadow: "0 2px 6px rgba(45, 55, 72, 0.1)",
+  border: "1px solid #e0e0e0",
   cursor: "pointer",
-  transition: "all 0.25s ease-in-out",
+  transition: "all 0.3s ease",
+  userSelect: "none",
+  borderColor: "black",
+
 };
 
 const itemHoverStyle = {
-  backgroundColor: "#c3dafe",
+  backgroundColor: "#e6f0ff",
   transform: "scale(1.02)",
-  boxShadow: "0 6px 14px rgba(66, 153, 225, 0.3)",
+  color: "#1a3d7c",
 };
 
 const buttonStyle = {
   display: "block",
-  margin: "0 auto 25px auto",
+  margin: "0 auto 30px auto",
   padding: "12px 28px",
-  backgroundColor: "#4c51bf",
-  color: "#f7fafc",
-  fontSize: "18px",
+  backgroundColor: "#1e90ff",
+  color: "#ffffff",
+  fontSize: "16px",
   fontWeight: "600",
   border: "none",
   borderRadius: "14px",
   cursor: "pointer",
-  boxShadow: "0 5px 15px rgba(76, 81, 191, 0.4)",
-  transition: "all 0.3s ease",
+  boxShadow: "0 4px 12px rgba(30, 144, 255, 0.3)",
+  transition: "background-color 0.3s ease, box-shadow 0.3s ease",
 };
