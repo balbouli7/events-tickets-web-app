@@ -73,9 +73,10 @@ const Footer = () => {
 const footerStyle = {
   backgroundColor: '#2563EB',
   color: '#FFFFFF',
-  padding: '40px 24px 20px',
+  padding: '40px 24px 20px 20px' ,
   fontFamily: 'Inter, -apple-system, sans-serif',
   width: '100%',
+  marginTop: '100px',
 };
 
 const containerStyle = {
@@ -85,6 +86,7 @@ const containerStyle = {
   flexWrap: 'wrap',
   justifyContent: 'space-between',
   gap: '30px',
+  
 };
 
 const sectionStyle = {

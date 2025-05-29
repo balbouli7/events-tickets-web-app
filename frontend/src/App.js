@@ -31,6 +31,7 @@ import LoadingSpinner from "./spinner";
 import EventsByCategory from "./components/eventsComponents/eventsByCategory";
 import DashboardLayout from "./components/layouts/dashboardLayout";
 import HomePage from "./components/layouts/homePage";
+import Settings from "./components/settings";
 
 function App() {
   const [userEmail, setUserEmail] = useState("");
@@ -60,6 +61,7 @@ function App() {
 
               <Route path="/" element={<DashboardLayout />}>
                             {/* Auth Routes */}
+                <Route path="" element={<HomePage />} />
                 <Route path="register" element={<Register setUserEmail={setUserEmail} />} />
                 <Route path="verify" element={<VerifyUser email={userEmail} />} />
                 <Route path="login" element={<Login />} />
@@ -83,10 +85,9 @@ function App() {
                 <Route path="myTickets" element={<UserTickets />}/>
                 <Route path="allTickets" element={<PrivateRoute element={<AllTickets />} />} />
                 <Route path="eventsByCategory/:categoryId" element={<EventsByCategory />}/>
+                <Route path="settings" element={<Settings />}/>
               </Route>
 
-              {/* Default Route */}
-              <Route path="/" element={<HomePage />} />
             </Routes>
           </OrdersProvider>
         </CartProvider>

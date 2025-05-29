@@ -213,96 +213,178 @@ const GetAllEvents = () => {
                   key={event._id}
                   style={{
                     ...styles.card,
-                    transform: isHovered ? "scale(1.03)" : "scale(1)",
+                    transform: isHovered ? "scale(1.05)" : "scale(1)",
                     boxShadow: isHovered
-                      ? "0 6px 16px rgba(0,0,0,0.15)"
-                      : "0 2px 8px rgba(0,0,0,0.1)",
+                      ? "0 8px 24px rgba(0, 0, 0, 0.15)"
+                      : "0 4px 12px rgba(0, 0, 0, 0.1)",
+                    borderRadius: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
+                    cursor: "pointer",
+                    backgroundColor: "#fff",
+                    transition: "all 0.3s ease",
                   }}
                   onMouseEnter={() => setHoveredCardId(event._id)}
                   onMouseLeave={() => setHoveredCardId(null)}
                   onClick={() => navigate(`/events/${event._id}`)}
                 >
-                  {/* Checkbox removed */}
-
                   {event.image && (
                     <img
                       src={event.image}
                       alt={event.title}
-                      style={styles.image}
+                      style={{
+                        width: "100%",
+                        height: "180px",
+                        objectFit: "cover",
+                        borderTopLeftRadius: "16px",
+                        borderTopRightRadius: "16px",
+                        transition: "transform 0.3s ease",
+                        transform: isHovered ? "scale(1.1)" : "scale(1)",
+                      }}
                     />
                   )}
-                  <div style={cardContentStyles}>
+                  <div
+                    style={{
+                      padding: "20px",
+                      display: "flex",
+                      flexDirection: "column",
+                      flexGrow: 1,
+                      gap: "8px",
+                    }}
+                  >
                     <h3
                       title={event.title}
                       style={{
+                        fontSize: "1.3rem",
+                        fontWeight: "700",
+                        color: "#222",
+                        margin: 0,
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-                        maxWidth: "100%",
                       }}
                     >
                       {event.title}
                     </h3>
-                    <p>
-                      <strong>Date:</strong>{" "}
-                      {new Date(event.date).toLocaleDateString()}
+                    <div style={{ color: "#555", fontSize: "0.9rem" }}>
+                      <p style={{ margin: "4px 0" }}>
+                        <strong>Date:</strong>{" "}
+                        {new Date(event.date).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </p>
+                      <p style={{ margin: "4px 0" }}>
+                        <strong>Location:</strong> {event.location}
+                      </p>
+                      <p style={{ margin: "4px 0" }}>
+                        <strong>Category:</strong>{" "}
+                        <span
+                          style={{
+                            backgroundColor: "#f0f0f0",
+                            padding: "2px 8px",
+                            borderRadius: "12px",
+                            fontSize: "0.8rem",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {event.category?.name}
+                        </span>
+                      </p>
+                    </div>
+                    <p
+                      style={{
+                        flexGrow: 1,
+                        fontSize: "0.9rem",
+                        color: "#666",
+                        lineHeight: "1.3",
+                        marginTop: "8px",
+                        overflow: "hidden",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {event.description}
                     </p>
-                    <p>
-                      <strong>Location:</strong> {event.location}
-                    </p>
-                    <p>
-                      <strong>Category:</strong> {event.category?.name}
-                    </p>
-                    <p style={{ fontSize: "14px" }}>{event.description}</p>
-                    <div style={cardBtnGroup}>
+
+                    <div
+                      style={{
+                        marginTop: "auto",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        flexWrap: "wrap",
+                        gap: "10px",
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <button
-                        style={viewBtnStyle}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/events/${event._id}`);
+                        style={{
+                          ...viewBtnStyle,
+                          flex: "1 1 auto",
+                          backgroundColor: "#111",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          fontWeight: "700",
+                          transition: "background-color 0.3s ease",
                         }}
                         onMouseOver={(e) =>
-                          (e.target.style.backgroundColor = "#4b4b4d")
+                          (e.target.style.backgroundColor = "#333")
                         }
                         onMouseOut={(e) =>
-                          (e.target.style.backgroundColor = "black")
+                          (e.target.style.backgroundColor = "#111")
                         }
+                        onClick={() => navigate(`/events/${event._id}`)}
                       >
                         View
                       </button>
                       {isAdmin && (
-                        <button
-                          style={editBtnStyle}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/update-event/${event._id}`);
-                          }}
-                          onMouseOver={(e) =>
-                            (e.target.style.backgroundColor = "#f5ce0b")
-                          }
-                          onMouseOut={(e) =>
-                            (e.target.style.backgroundColor = "#f59e0b")
-                          }
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {isAdmin && (
-                        <button
-                          style={deleteSingleBtnStyle}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(event._id);
-                          }}
-                          onMouseOver={(e) =>
-                            (e.target.style.backgroundColor = "#dc5026")
-                          }
-                          onMouseOut={(e) =>
-                            (e.target.style.backgroundColor = "#dc2626")
-                          }
-                        >
-                          Delete
-                        </button>
+                        <>
+                          <button
+                            style={{
+                              ...editBtnStyle,
+                              flex: "1 1 auto",
+                              backgroundColor: "#f59e0b",
+                              padding: "10px",
+                              borderRadius: "8px",
+                              fontWeight: "700",
+                              transition: "background-color 0.3s ease",
+                            }}
+                            onMouseOver={(e) =>
+                              (e.target.style.backgroundColor = "#d47c00")
+                            }
+                            onMouseOut={(e) =>
+                              (e.target.style.backgroundColor = "#f59e0b")
+                            }
+                            onClick={() =>
+                              navigate(`/update-event/${event._id}`)
+                            }
+                          >
+                            Edit
+                          </button>
+                          <button
+                            style={{
+                              ...deleteSingleBtnStyle,
+                              flex: "1 1 auto",
+                              backgroundColor: "#dc2626",
+                              padding: "10px",
+                              borderRadius: "8px",
+                              fontWeight: "700",
+                              transition: "background-color 0.3s ease",
+                            }}
+                            onMouseOver={(e) =>
+                              (e.target.style.backgroundColor = "#a22020")
+                            }
+                            onMouseOut={(e) =>
+                              (e.target.style.backgroundColor = "#dc2626")
+                            }
+                            onClick={() => handleDelete(event._id)}
+                          >
+                            Delete
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -357,11 +439,7 @@ const selectStyles = {
   minWidth: "150px",
 };
 
-const deleteButtonContainerStyles = {
-  marginBottom: "10px",
-  display: "flex",
-  justifyContent: "flex-end",
-};
+
 
 const deleteButtonStyles = {
   backgroundColor: "#dc2626",
@@ -373,9 +451,7 @@ const deleteButtonStyles = {
   fontWeight: "600",
 };
 
-const tableHeaderStyles = {
-  backgroundColor: "#f1f1f1",
-};
+
 
 const loadingStyles = {
   color: "black",
@@ -389,14 +465,7 @@ const errorStyles = {
   padding: "20px",
 };
 
-const cellStyle = {
-  textAlign: "center",
-  verticalAlign: "middle",
-  padding: "10px",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
+
 
 const viewBtnStyle = {
   backgroundColor: "black",
@@ -438,52 +507,15 @@ const deleteSingleBtnStyle = {
   boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
   transition: "background-color 0.3s ease",
 };
-const gridContainerStyles = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-  gap: "20px",
-  justifyContent: "center",
-  alignItems: "start",
-  padding: "20px 0",
-  maxWidth: "1200px",
-  margin: "0 auto",
-};
 
-const cardStyles = {
-  position: "relative",
-  backgroundColor: "#fff",
-  borderRadius: "12px",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  overflow: "hidden",
-  display: "flex",
-  flexDirection: "column",
-};
 
-const imageStyles = {
-  width: "100%",
-  height: "180px",
-  objectFit: "cover",
-};
-
-const cardContentStyles = {
-  padding: "16px",
-  flex: 1,
-};
-
-const cardBtnGroup = {
-  marginTop: "12px",
-  display: "flex",
-  justifyContent: "space-between",
-  flexWrap: "wrap",
-  gap: "8px",
-};
 const styles = {
   container: {
     padding: "20px",
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+    gridTemplateColumns: "repeat(3, 1fr)",
     gap: "20px",
   },
   card: {

@@ -44,7 +44,7 @@ const EventDetail = () => {
         return {
           ticketType,
           quantity,
-          price: ticket?.price || 0, // include price
+          price: ticket?.price || 0,
         };
       });
 
@@ -53,13 +53,10 @@ const EventDetail = () => {
       return;
     }
 
-    // Update local state to decrease available tickets
     const updatedEvent = {
       ...event,
       ticketTypes: event.ticketTypes.map((ticket) => {
-        const selectedTicket = selected.find(
-          (t) => t.ticketType === ticket.type
-        );
+        const selectedTicket = selected.find((t) => t.ticketType === ticket.type);
         if (selectedTicket) {
           return {
             ...ticket,
@@ -78,53 +75,45 @@ const EventDetail = () => {
     navigate(`/checkout/${event._id}`);
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div style={styles.loadingContainer}>
         <div style={styles.spinner}></div>
         <p>Loading event details...</p>
       </div>
     );
+  }
 
-  if (error)
+  if (error || !event) {
     return (
       <div style={styles.errorContainer}>
         <div style={styles.errorCard}>
-          <h3>Error Loading Event</h3>
-          <p>{error}</p>
+          <h3>{error ? "Error Loading Event" : "Event Not Found"}</h3>
+          <p>
+            {error ||
+              "The event you're looking for doesn't exist or may have been removed."}
+          </p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => (error ? window.location.reload() : navigate("/"))}
             style={styles.retryButton}
           >
-            Retry
+            {error ? "Retry" : "Browse Events"}
           </button>
         </div>
       </div>
     );
-
-  if (!event)
-    return (
-      <div style={styles.errorContainer}>
-        <div style={styles.errorCard}>
-          <h3>Event Not Found</h3>
-          <p>
-            The event you're looking for doesn't exist or may have been removed.
-          </p>
-          <button onClick={() => navigate("/")} style={styles.retryButton}>
-            Browse Events
-          </button>
-        </div>
-      </div>
-    );
+  }
 
   const totalAvailableTickets = event.ticketTypes.reduce(
     (sum, ticket) => sum + ticket.quantity,
     0
   );
+
   const soldTickets = event.ticketTypes.reduce(
     (sum, ticket) => sum + ((ticket.initialQuantity || 0) - ticket.quantity),
     0
   );
+
   const calculateTotalTickets = () => {
     return event.ticketTypes.reduce(
       (sum, ticket) => sum + (ticket.initialQuantity || 0),
@@ -134,9 +123,7 @@ const EventDetail = () => {
 
   return (
     <div style={styles.container}>
-      {/* Main content */}
       <div style={styles.content}>
-        {/* Event image */}
         <div style={styles.imageContainer}>
           <img
             src={event.image}
@@ -150,7 +137,6 @@ const EventDetail = () => {
           />
         </div>
 
-        {/* Event details */}
         <div style={styles.detailsContainer}>
           <div style={styles.detailsHeader}>
             <div>
@@ -183,7 +169,6 @@ const EventDetail = () => {
             <p style={styles.eventDescription}>{event.description}</p>
           </div>
 
-          {/* Tickets section */}
           <div style={styles.ticketsContainer}>
             <div style={{ marginBottom: "25px" }}>
               <h3 style={styles.sectionTitle}>
@@ -205,62 +190,65 @@ const EventDetail = () => {
               )}
             </div>
 
-            <div style={styles.ticketGrid}>
-              {event.ticketTypes.map((ticket) => (
-                <div key={ticket._id} style={styles.ticketCard}>
-                  <div style={styles.ticketHeader}>
-                    <h4 style={styles.ticketType}>{ticket.type}</h4>
-                    <p style={styles.ticketPrice}>{ticket.price}DT</p>
+            {totalAvailableTickets === 0 ? (
+              <div style={styles.soldOutBanner}>🎟️ Sold Out 🎟️</div>
+            ) : (
+              <div style={styles.ticketGrid}>
+                {event.ticketTypes.map((ticket) => (
+                  <div key={ticket._id} style={styles.ticketCard}>
+                    <div style={styles.ticketHeader}>
+                      <h4 style={styles.ticketType}>{ticket.type}</h4>
+                      <p style={styles.ticketPrice}>{ticket.price}DT</p>
+                    </div>
+                    {user?.role === "admin" && (
+                      <p style={styles.ticketAvailability}>
+                        {ticket.quantity} tickets remaining
+                      </p>
+                    )}
+                    <div style={styles.ticketControls}>
+                      <button
+                        style={styles.quantityButton}
+                        onClick={() =>
+                          setTicketSelection({
+                            ...ticketSelection,
+                            [ticket.type]: Math.max(
+                              (ticketSelection[ticket.type] || 0) - 1,
+                              0
+                            ),
+                          })
+                        }
+                        disabled={(ticketSelection[ticket.type] || 0) <= 0}
+                      >
+                        -
+                      </button>
+                      <span style={styles.quantityDisplay}>
+                        {ticketSelection[ticket.type] || 0}
+                      </span>
+                      <button
+                        style={styles.quantityButton}
+                        onClick={() =>
+                          setTicketSelection({
+                            ...ticketSelection,
+                            [ticket.type]: Math.min(
+                              (ticketSelection[ticket.type] || 0) + 1,
+                              ticket.quantity
+                            ),
+                          })
+                        }
+                        disabled={
+                          (ticketSelection[ticket.type] || 0) >= ticket.quantity
+                        }
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
-                  {/* Admin-only ticket availability */}
-                  {user?.role === "admin" && (
-                    <p style={styles.ticketAvailability}>
-                      {ticket.quantity} tickets remaining
-                    </p>
-                  )}
-                  <div style={styles.ticketControls}>
-                    <button
-                      style={styles.quantityButton}
-                      onClick={() =>
-                        setTicketSelection({
-                          ...ticketSelection,
-                          [ticket.type]: Math.max(
-                            (ticketSelection[ticket.type] || 0) - 1,
-                            0
-                          ),
-                        })
-                      }
-                      disabled={(ticketSelection[ticket.type] || 0) <= 0}
-                    >
-                      -
-                    </button>
-                    <span style={styles.quantityDisplay}>
-                      {ticketSelection[ticket.type] || 0}
-                    </span>
-                    <button
-                      style={styles.quantityButton}
-                      onClick={() =>
-                        setTicketSelection({
-                          ...ticketSelection,
-                          [ticket.type]: Math.min(
-                            (ticketSelection[ticket.type] || 0) + 1,
-                            ticket.quantity
-                          ),
-                        })
-                      }
-                      disabled={
-                        (ticketSelection[ticket.type] || 0) >= ticket.quantity
-                      }
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Action buttons at bottom */}
+          {/* Action buttons */}
           <div style={styles.actionButtons}>
             <button onClick={() => navigate(-1)} style={styles.backButton}>
               <FaArrowLeft style={{ marginRight: 8 }} />
@@ -269,7 +257,10 @@ const EventDetail = () => {
             <button
               onClick={handleCheckout}
               style={styles.checkoutButton}
-              disabled={Object.values(ticketSelection).every((qty) => qty <= 0)}
+              disabled={
+                Object.values(ticketSelection).every((qty) => qty <= 0) ||
+                totalAvailableTickets === 0
+              }
             >
               Proceed to Checkout
               <FaChevronRight style={{ marginLeft: 8 }} />
@@ -562,6 +553,16 @@ const styles = {
     ":hover": {
       backgroundColor: "#4338ca",
     },
+  },
+  soldOutBanner: {
+    textAlign: "center",
+    fontSize: "28px",
+    fontWeight: "bold",
+    color: "#dc2626",
+    padding: "30px",
+    backgroundColor: "#ffe4e6",
+    borderRadius: "10px",
+    marginTop: "20px",
   },
 };
 

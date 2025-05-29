@@ -28,7 +28,7 @@ const AddCategory = () => {
       const response = await createCategory(categoryData);
       setSuccess(response.message);
       setCategoryData({ name: '', description: '' });
-      navigate("/allCategory");
+      navigate("/allCategories");
     } catch (err) {
       setError(err.response?.data?.message || 'Error creating category');
     } finally {

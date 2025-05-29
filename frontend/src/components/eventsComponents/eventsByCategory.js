@@ -24,6 +24,7 @@ const EventsByCategory = () => {
         setEvents(data);
       } catch (err) {
         console.error("Error fetching events:", err);
+        setError("Failed to load events. Please check your connection and try again.");
       } finally {
         setLoading(false);
       }
@@ -31,6 +32,11 @@ const EventsByCategory = () => {
 
     getEvents();
   }, [categoryId]);
+
+  useEffect(() => {
+    setSearchTerm("");
+  }, [searchBy]);
+
   const filteredEvents = events.filter((event) => {
     const value = event[searchBy]?.toString().toLowerCase();
     const matchesSearch = value?.includes(searchTerm.toLowerCase());
@@ -40,7 +46,13 @@ const EventsByCategory = () => {
     return matchesSearch && matchesCategory;
   });
 
-  if (loading) return <p>Loading events...</p>;
+  if (loading) {
+    return <div style={loadingStyles}>Loading events...</div>;
+  }
+
+  if (error) {
+    return <div style={errorStyles}>{error}</div>;
+  }
 
   return (
     <div style={containerStyles}>
@@ -96,6 +108,20 @@ const EventsByCategory = () => {
           <option value="location">Location</option>
           <option value="date">Date</option>
         </select>
+
+        {/* Category Dropdown */}
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          style={selectStyles}
+        >
+          <option value="">All Categories</option>
+          {categories?.map((cat) => (
+            <option key={cat._id} value={cat.name}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Cards Grid */}
@@ -109,62 +135,64 @@ const EventsByCategory = () => {
                   key={event._id}
                   style={{
                     ...styles.card,
-                    transform: isHovered ? "scale(1.03)" : "scale(1)",
+                    transform: isHovered ? "translateY(-5px)" : "translateY(0)",
                     boxShadow: isHovered
-                      ? "0 6px 16px rgba(0,0,0,0.15)"
-                      : "0 2px 8px rgba(0,0,0,0.1)",
+                      ? "0 8px 20px rgba(0,0,0,0.15)"
+                      : "0 4px 12px rgba(0,0,0,0.08)",
                   }}
                   onMouseEnter={() => setHoveredCardId(event._id)}
                   onMouseLeave={() => setHoveredCardId(null)}
                   onClick={() => navigate(`/events/${event._id}`)}
                 >
-                  {/* Checkbox removed */}
-
                   {event.image && (
                     <img
                       src={event.image}
                       alt={event.title}
-                      style={styles.image}
+                      style={{
+                        width: "100%",
+                        height: "200px",
+                        objectFit: "cover",
+                        borderTopLeftRadius: "12px",
+                        borderTopRightRadius: "12px",
+                      }}
                     />
                   )}
                   <div style={cardContentStyles}>
-                    <h3
-                      title={event.title}
-                      style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxWidth: "100%",
-                      }}
-                    >
-                      {event.title}
-                    </h3>
-                    <p>
-                      <strong>Date:</strong>{" "}
-                      {new Date(event.date).toLocaleDateString()}
+                    {event.category?.name && (
+                      <span style={categoryTagStyle}>{event.category.name}</span>
+                    )}
+                    
+                    <h3 style={titleStyle}>{event.title}</h3>
+                    
+                    <p style={detailStyle}>
+                      <svg style={iconStyle} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      {new Date(event.date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
                     </p>
-                    <p>
-                      <strong>Location:</strong> {event.location}
+                    
+                    <p style={detailStyle}>
+                      <svg style={iconStyle} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {event.location}
                     </p>
-                    <p>
-                      <strong>Category:</strong> {event.category?.name}
-                    </p>
-                    <p style={{ fontSize: "14px" }}>{event.description}</p>
-                    <div style={cardBtnGroup}>
+                    
+                    {event.description && (
+                      <p style={descriptionStyle}>{event.description}</p>
+                    )}
+                    
+                    <div style={cardBtnGroup} onClick={(e) => e.stopPropagation()}>
                       <button
                         style={viewBtnStyle}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/events/${event._id}`);
-                        }}
-                        onMouseOver={(e) =>
-                          (e.target.style.backgroundColor = "#4b4b4d")
-                        }
-                        onMouseOut={(e) =>
-                          (e.target.style.backgroundColor = "black")
-                        }
+                        onClick={() => navigate(`/events/${event._id}`)}
                       >
-                        View
+                        View Details
                       </button>
                     </div>
                   </div>
@@ -180,7 +208,7 @@ const EventsByCategory = () => {
   );
 };
 
-// Styles
+// Styles (same as GetAllEvents)
 const containerStyles = {
   background: "#ffffff",
   minHeight: "100vh",
@@ -219,26 +247,6 @@ const selectStyles = {
   minWidth: "150px",
 };
 
-const deleteButtonContainerStyles = {
-  marginBottom: "10px",
-  display: "flex",
-  justifyContent: "flex-end",
-};
-
-const deleteButtonStyles = {
-  backgroundColor: "#dc2626",
-  color: "#fff",
-  border: "none",
-  padding: "10px 20px",
-  borderRadius: "6px",
-  cursor: "pointer",
-  fontWeight: "600",
-};
-
-const tableHeaderStyles = {
-  backgroundColor: "#f1f1f1",
-};
-
 const loadingStyles = {
   color: "black",
   textAlign: "center",
@@ -251,125 +259,107 @@ const errorStyles = {
   padding: "20px",
 };
 
-const cellStyle = {
-  textAlign: "center",
-  verticalAlign: "middle",
-  padding: "10px",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
-
 const viewBtnStyle = {
-  backgroundColor: "black",
-  color: "#ffffff",
+  backgroundColor: "#000",
+  color: "#fff",
   border: "none",
   borderRadius: "6px",
   padding: "8px 16px",
   fontSize: "14px",
   fontWeight: "500",
   cursor: "pointer",
-  marginRight: "8px",
-  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-  transition: "background-color 0.3s ease",
-};
-
-const editBtnStyle = {
-  backgroundColor: "#f59e0b",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: "8px",
-  padding: "10px 18px",
-  fontSize: "14px",
-  fontWeight: "600",
-  cursor: "pointer",
-  marginRight: "8px",
-  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-  transition: "background-color 0.3s ease",
-};
-
-const deleteSingleBtnStyle = {
-  backgroundColor: "#dc2626",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: "6px",
-  padding: "8px 16px",
-  fontSize: "14px",
-  fontWeight: "500",
-  cursor: "pointer",
-  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-  transition: "background-color 0.3s ease",
-};
-const gridContainerStyles = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-  gap: "20px",
-  justifyContent: "center",
-  alignItems: "start",
-  padding: "20px 0",
-  maxWidth: "1200px",
-  margin: "0 auto",
-};
-
-const cardStyles = {
-  position: "relative",
-  backgroundColor: "#fff",
-  borderRadius: "12px",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  overflow: "hidden",
-  display: "flex",
-  flexDirection: "column",
-};
-
-const imageStyles = {
-  width: "100%",
-  height: "180px",
-  objectFit: "cover",
-};
-
-const cardContentStyles = {
-  padding: "16px",
   flex: 1,
+  minWidth: "120px",
+  transition: "all 0.2s ease",
+  ":hover": {
+    backgroundColor: "#333",
+  }
 };
 
-const cardBtnGroup = {
-  marginTop: "12px",
-  display: "flex",
-  justifyContent: "space-between",
-  flexWrap: "wrap",
-  gap: "8px",
-};
 const styles = {
   container: {
     padding: "20px",
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-    gap: "20px",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "25px",
   },
   card: {
     backgroundColor: "#fff",
-    borderRadius: "10px",
+    borderRadius: "12px",
     overflow: "hidden",
-    textAlign: "center",
-    padding: "10px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
     cursor: "pointer",
     transition: "transform 0.3s ease, box-shadow 0.3s ease",
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    border: "1px solid #f0f0f0",
   },
-  image: {
-    width: "100%",
-    height: "180px",
-    objectFit: "cover",
-    borderRadius: "8px",
-  },
-  title: {
-    fontSize: "1.2rem",
-    margin: "10px 0 5px",
-  },
-  date: {
-    color: "#555",
-  },
+};
+
+const cardContentStyles = {
+  padding: "20px",
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+};
+
+const cardBtnGroup = {
+  marginTop: "auto",
+  paddingTop: "15px",
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "10px",
+  flexWrap: "wrap",
+};
+
+const categoryTagStyle = {
+  backgroundColor: "#f0f0f0",
+  color: "#555",
+  padding: "4px 10px",
+  borderRadius: "20px",
+  fontSize: "12px",
+  fontWeight: "600",
+  marginBottom: "10px",
+  alignSelf: "flex-start",
+};
+
+const titleStyle = {
+  fontSize: "18px",
+  fontWeight: "600",
+  margin: "0 0 8px 0",
+  color: "#222",
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+};
+
+const detailStyle = {
+  fontSize: "14px",
+  color: "#666",
+  margin: "4px 0",
+  display: "flex",
+  alignItems: "center",
+  gap: "6px",
+};
+
+const iconStyle = {
+  width: "16px",
+  height: "16px",
+  color: "#888",
+};
+
+const descriptionStyle = {
+  fontSize: "14px",
+  color: "#555",
+  margin: "10px 0",
+  display: "-webkit-box",
+  WebkitLineClamp: 3,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 };
 
 export default EventsByCategory;
