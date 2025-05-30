@@ -340,7 +340,7 @@ const styles = {
     padding: "40px",
     maxWidth: "1020px",
     borderRadius: "16px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f9f9f9" ,
     boxShadow: "0 12px 40px rgba(0, 0, 0, 0.08)",
     fontFamily: "'Segoe UI', sans-serif",
     display: "flex",

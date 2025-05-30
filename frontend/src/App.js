@@ -32,6 +32,7 @@ import EventsByCategory from "./components/eventsComponents/eventsByCategory";
 import DashboardLayout from "./components/layouts/dashboardLayout";
 import HomePage from "./components/layouts/homePage";
 import Settings from "./components/settings";
+import Chat from "./components/chatComponent";
 
 function App() {
   const [userEmail, setUserEmail] = useState("");
@@ -71,7 +72,7 @@ function App() {
                 <Route path="users" element={<PrivateRoute element={<GetAllUsers />} />} />
                 <Route path="users/details/:id" element={<PrivateRoute element={<UserProfile />} />} />
                 <Route path="users/update/:id" element={<PrivateRoute element={<UpdateUser />} />} />
-                <Route path="createEvent" element={<PrivateRoute element={<CreateEvent />} />} />
+                <Route path="/profile/:id" element={<UpdateUser />} />                <Route path="createEvent" element={<PrivateRoute element={<CreateEvent />} />} />
                 <Route path="events" element={<GetAllEvents />} />
                 <Route path="events/:id" element={<EventDetail />}/>
                 <Route path="addCategory" element={<PrivateRoute element={<AddCategory />} />} />
@@ -86,6 +87,7 @@ function App() {
                 <Route path="allTickets" element={<PrivateRoute element={<AllTickets />} />} />
                 <Route path="eventsByCategory/:categoryId" element={<EventsByCategory />}/>
                 <Route path="settings" element={<Settings />}/>
+                <Route path="chat" element={<Chat />} />
               </Route>
 
             </Routes>

@@ -176,7 +176,7 @@ const styles = {
     padding: "20px",
     borderRadius: "10px",
     boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f9f9" ,
   },
   heading: {
     textAlign: "center",

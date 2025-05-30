@@ -113,7 +113,7 @@ const CreateEvent = () => {
   };
 
   return (
-    <Container style={{ maxWidth: "800px", paddingTop: "30px" }}>
+    <Container style={{ maxWidth: "800px", paddingTop: "30px",backgroundColor: "#f9f9f9"  }}>
       <Card bg="dark" text="light" className="p-4 shadow-lg">
         <Card.Body>
           <Card.Title as="h3" className="mb-4 text-center">

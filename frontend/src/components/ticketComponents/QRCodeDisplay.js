@@ -147,7 +147,6 @@ const TicketDisplay = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-        console.log("ticketRes.data:", ticketRes.data);
         setTicketData(ticketRes.data);
         setQrCodes(qrRes.data.qrCodes);
 
@@ -169,10 +168,16 @@ const TicketDisplay = () => {
     navigate("/myTickets");
   };
 
+  if (loading) {
+    return (
+      <div style={styles.noData}>
+        <p>Loading ticket details...</p>
+      </div>
+    );
+  }
   if (!ticketData) {
     return <p style={styles.noData}>No ticket data found.</p>;
   }
-
   return (
     <div style={styles.container}>
       <div style={styles.imageContainer}>
@@ -238,33 +243,74 @@ const TicketDisplay = () => {
       </div>
       <div style={styles.qrContainer}>
         {qrCodes.length > 0 &&
-          qrCodes.map((src, idx) => (
-            <div
-              key={idx}
-              style={{
-                marginBottom: "10rem",
-                textAlign: "center",
-              }}
-            >
-              <h3
+          qrCodes.map((src, idx) => {
+            // Find the corresponding ticket for this QR code
+            const ticketIndex =
+              Math.floor(idx / ticketData.tickets[idx]?.quantity) || idx;
+            const ticket = ticketData.tickets[ticketIndex];
+
+            return (
+              <div
+                key={idx}
                 style={{
-                  color: "#38bdf8",
-                  marginBottom: "0.5rem",
-                  fontSize: "1.2rem",
+                  marginBottom: "10rem",
+                  textAlign: "center",
                 }}
               >
-                {ticketData.tickets[idx]?.ticketType || `Ticket #${idx + 1}`}
-              </h3>
-              <img
-                src={src}
-                alt={`QR Code ${idx + 1}`}
-                style={styles.qrImage}
-              />
-              <p style={styles.qrCaption}>
-                Ticket #{idx + 1} – Present this QR code at the event entrance
-              </p>
-            </div>
-          ))}
+                <h3
+                  style={{
+                    color: "#38bdf8",
+                    marginBottom: "0.5rem",
+                    fontSize: "1.2rem",
+                  }}
+                >
+                  {ticket?.ticketType || `Ticket #${idx + 1}`}
+                  {ticket?.quantity > 1 &&
+                    ` (Copy ${(idx % ticket.quantity) + 1} of ${
+                      ticket.quantity
+                    })`}
+                </h3>
+                <img
+                  src={src}
+                  alt={`QR Code ${idx + 1}`}
+                  style={styles.qrImage}
+                  id={`qrImage-${idx}`}
+                />
+                <p style={styles.qrCaption}>
+                  {ticket
+                    ? `${ticket.ticketType} - Present this QR code at the event entrance`
+                    : `Ticket #${
+                        idx + 1
+                      } - Present this QR code at the event entrance`}
+                </p>
+                <a
+                  href={src}
+                  download={`${ticket?.ticketType || "Ticket"}_QR_${
+                    idx + 1
+                  }.png`}
+                  style={{
+                    display: "inline-block",
+                    marginTop: "0.5rem",
+                    backgroundColor: "#38bdf8",
+                    color: "#0f172a",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "8px",
+                    fontWeight: "bold",
+                    textDecoration: "none",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  onMouseOver={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#0ea5e9")
+                  }
+                  onMouseOut={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#38bdf8")
+                  }
+                >
+                  ⬇️ Download QR
+                </a>
+              </div>
+            );
+          })}
       </div>
 
       <div style={styles.buttonContainer}>

@@ -27,7 +27,7 @@ const MyOrders = () => {
   const styles = {
     container: {
       padding: "30px",
-      backgroundColor: "#fff",
+      backgroundColor: "#f9f9f9" ,
       borderRadius: "10px",
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
       margin: "40px auto",

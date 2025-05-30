@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getOrderById } from '../../api/userServices';
+import { deleteOrder, getOrderById } from '../../api/userServices';
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -12,6 +12,21 @@ const OrderDetails = () => {
     const fetchOrder = async () => {
       const data = await getOrderById(id, token);
       setOrder(data);
+      
+      // Schedule order deletion if event date has passed
+      if (data && data.event && data.event.date) {
+        const eventDate = new Date(data.event.date);
+        const deleteDate = new Date(eventDate);
+        deleteDate.setDate(deleteDate.getDate() + 1); // Add 1 day to event date
+        
+        if (new Date() > deleteDate) {
+          try {
+            await deleteOrder(id, token);
+          } catch (error) {
+            console.error('Error deleting order:', error);
+          }
+        }
+      }
     };
     fetchOrder();
   }, [id, token]);

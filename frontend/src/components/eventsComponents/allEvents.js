@@ -402,8 +402,8 @@ const GetAllEvents = () => {
 
 // Styles
 const containerStyles = {
-  background: "#ffffff",
-  minHeight: "100vh",
+  backgroundColor: "#f9f9f9" ,
+   minHeight: "100vh",
   padding: "30px",
   fontFamily: "'Inter', sans-serif",
   color: "#333",

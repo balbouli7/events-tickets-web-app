@@ -65,7 +65,7 @@ export default function UpdateUser() {
       if (response) {
         setMessage("User updated successfully!");
         setTimeout(() => {
-          navigate("/users");
+          navigate(-1);
         }, 1000);
       } else {
         setMessage("Server Error. Try again.");
@@ -200,7 +200,7 @@ export default function UpdateUser() {
         </button>
         <button
           type="button"
-          onClick={() => navigate("/users")}
+          onClick={() => navigate(-1)}
           style={backButtonStyle}
           onMouseOver={(e) => (e.target.style.backgroundColor = "#e04835")}
           onMouseOut={(e) => (e.target.style.backgroundColor = "#ff4500")}

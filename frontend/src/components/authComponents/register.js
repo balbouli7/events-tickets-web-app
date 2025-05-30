@@ -43,7 +43,6 @@ export default function Register({ setUserEmail }) {
         try {
             const userData = { firstName, lastName, email, password, confirmPassword, mobile, address };
             
-            console.log("Sending data:", userData);
 
             const response = await register(userData);
 

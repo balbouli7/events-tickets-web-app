@@ -1,16 +1,36 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context.js/authContext";
+import { CartContext } from "../context.js/cartContext";
 
 const Settings = () => {
   const navigate = useNavigate();
+  const { user, isLoggedIn, logout } = useContext(AuthContext);
+  const { clearCart } = useContext(CartContext);
 
   const handleLogout = () => {
-    // Clear auth token, session, etc.
-    localStorage.clear();
+    sessionStorage.removeItem("cartItems");
+    clearCart();
+    logout();
     navigate("/login");
   };
 
   const [hoveredItem, setHoveredItem] = useState(null);
+
+  const handleProfileClick = () => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+
+    // Use user.id instead of user._id
+    if (user && user.id) {
+      navigate(`/profile/${user.id}`);
+    } else {
+      console.error('User ID not found:', user);
+      navigate('/login');
+    }
+  };
 
   return (
     <div style={cardStyle}>
@@ -23,7 +43,7 @@ const Settings = () => {
             ...itemStyle,
             ...(hoveredItem === "profile" ? itemHoverStyle : {}),
           }}
-          onClick={() => navigate("/profile")}
+          onClick={handleProfileClick}
           onMouseEnter={() => setHoveredItem("profile")}
           onMouseLeave={() => setHoveredItem(null)}
         >
@@ -62,7 +82,9 @@ const Settings = () => {
             <span style={iconStyle}>⚙️</span>
             <span>App Settings</span>
           </div>
-          <p style={descriptionStyle}>Dark Mode and other preferences coming soon</p>
+          <p style={descriptionStyle}>
+            Dark Mode and other preferences coming soon
+          </p>
         </li>
 
         {/* Contact Us */}

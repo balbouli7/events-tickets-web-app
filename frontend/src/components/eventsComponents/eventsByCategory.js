@@ -210,7 +210,7 @@ const EventsByCategory = () => {
 
 // Styles (same as GetAllEvents)
 const containerStyles = {
-  background: "#ffffff",
+  backgroundColor: "#f9f9f9" ,
   minHeight: "100vh",
   padding: "30px",
   fontFamily: "'Inter', sans-serif",

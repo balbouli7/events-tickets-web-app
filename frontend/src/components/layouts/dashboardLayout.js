@@ -10,7 +10,7 @@ const DashboardLayout = () => {
   const { user } = useContext(AuthContext);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'white', color: 'black' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: "#f9f9f9" , color: 'black' }}>
       {/* Navbar/Header */}
       {user?.role === 'admin' ? <AdminDashboard /> : <HomeNavbar />}
 
