@@ -4,6 +4,7 @@ import { FaShoppingCart, FaTicketAlt, FaUser } from 'react-icons/fa';
 import { AuthContext } from '../../context.js/authContext';
 import { CartContext } from '../../context.js/cartContext';
 import { OrdersContext } from '../../context.js/orderContext';
+import UserChatRequest from '../chatComponents/userChat';
 
 const HomeNavbar = () => {
   const { logout, user } = useContext(AuthContext);
@@ -209,6 +210,7 @@ const HomeNavbar = () => {
           )}
         </div>
       </div>
+      <UserChatRequest/>
     </nav>
   );
 };

@@ -10,6 +10,12 @@ import {
 } from "react-icons/fa";
 import { AuthContext } from "../../context.js/authContext";
 
+const hasEventStarted = (eventDate) => {
+  const now = new Date();
+  const eventDateTime = new Date(eventDate);
+  return now > eventDateTime;
+};
+
 const EventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -121,6 +127,8 @@ const EventDetail = () => {
     );
   };
 
+  const eventHasStarted = hasEventStarted(event.date);
+
   return (
     <div style={styles.container}>
       <div style={styles.content}>
@@ -190,7 +198,9 @@ const EventDetail = () => {
               )}
             </div>
 
-            {totalAvailableTickets === 0 ? (
+            {eventHasStarted ? (
+              <div style={styles.startedBanner}>🎭 Show Started - Ticket Sales Closed 🎭</div>
+            ) : totalAvailableTickets === 0 ? (
               <div style={styles.soldOutBanner}>🎟️ Sold Out 🎟️</div>
             ) : (
               <div style={styles.ticketGrid}>
@@ -259,7 +269,8 @@ const EventDetail = () => {
               style={styles.checkoutButton}
               disabled={
                 Object.values(ticketSelection).every((qty) => qty <= 0) ||
-                totalAvailableTickets === 0
+                totalAvailableTickets === 0 ||
+                eventHasStarted
               }
             >
               Proceed to Checkout
@@ -273,6 +284,16 @@ const EventDetail = () => {
 };
 
 const styles = {
+  startedBanner: {
+    textAlign: "center",
+    fontSize: "28px",
+    fontWeight: "bold",
+    color: "#d97706",
+    padding: "30px",
+    backgroundColor: "#fef3c7",
+    borderRadius: "10px",
+    marginTop: "20px",
+  },
   container: {
     backgroundColor: "#f8f9fa",
     minHeight: "100vh",
@@ -376,21 +397,6 @@ const styles = {
     gap: "20px",
     marginBottom: "15px",
     flexWrap: "wrap",
-  },
-  totalTicketInfo: {
-    fontSize: "15px",
-    color: "#4b5563",
-    margin: "5px 0",
-  },
-  totalTicketInfo: {
-    fontSize: "15px",
-    color: "#4b5563",
-    margin: "5px 0",
-  },
-  totalTicketInfo: {
-    fontSize: "15px",
-    color: "#4b5563",
-    margin: "5px 0",
   },
   totalTicketInfo: {
     fontSize: "15px",

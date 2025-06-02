@@ -59,7 +59,7 @@ const Settings = () => {
             ...itemStyle,
             ...(hoveredItem === "password" ? itemHoverStyle : {}),
           }}
-          onClick={() => navigate("/change-password")}
+          onClick={() => navigate("/updatePassword")}
           onMouseEnter={() => setHoveredItem("password")}
           onMouseLeave={() => setHoveredItem(null)}
         >
@@ -69,22 +69,20 @@ const Settings = () => {
           </div>
         </li>
 
-        {/* App Settings */}
+        {/* Terms and Conditions */}
         <li
           style={{
             ...itemStyle,
-            ...(hoveredItem === "app" ? itemHoverStyle : {}),
+            ...(hoveredItem === "terms" ? itemHoverStyle : {}),
           }}
-          onMouseEnter={() => setHoveredItem("app")}
+          onClick={() => navigate("/terms")}
+          onMouseEnter={() => setHoveredItem("terms")}
           onMouseLeave={() => setHoveredItem(null)}
         >
           <div style={itemContentStyle}>
-            <span style={iconStyle}>⚙️</span>
-            <span>App Settings</span>
+            <span style={iconStyle}>📄</span>
+            <span>Terms and Conditions</span>
           </div>
-          <p style={descriptionStyle}>
-            Dark Mode and other preferences coming soon
-          </p>
         </li>
 
         {/* Contact Us */}
@@ -100,6 +98,21 @@ const Settings = () => {
           <div style={itemContentStyle}>
             <span style={iconStyle}>📞</span>
             <span>Contact Us</span>
+          </div>
+        </li>
+        {/* About Us */}
+        <li
+          style={{
+            ...itemStyle,
+            ...(hoveredItem === "about us" ? itemHoverStyle : {}),
+          }}
+          onClick={() => navigate("/aboutUs")}
+          onMouseEnter={() => setHoveredItem("about us")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <div style={itemContentStyle}>
+            <span style={iconStyle}>ℹ️</span>
+            <span>About Us</span>
           </div>
         </li>
 

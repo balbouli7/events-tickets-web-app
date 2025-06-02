@@ -1,4 +1,5 @@
 import React from 'react';
+import AdminChatPanel from '../chatComponents/adminPanelChat';
 
 const AdminHome = () => {
   const styles = {

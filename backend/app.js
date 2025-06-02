@@ -10,6 +10,7 @@ dotenv.config();
 const connectDB = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 const socketHandler = require('./controllers/chatSocket'); // 👈 Import socket handler
 
 const app = express();
@@ -41,7 +42,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
-
+app.use('/api', chatRoutes);
 // Start the server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

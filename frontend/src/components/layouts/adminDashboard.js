@@ -4,11 +4,12 @@ import { FaShoppingCart } from 'react-icons/fa';
 import { AuthContext } from '../../context.js/authContext';
 import { CartContext } from '../../context.js/cartContext';
 import { OrdersContext } from '../../context.js/orderContext';
+import AdminChatPanel from '../chatComponents/adminPanelChat';
 
 const AdminDashboard = () => {
   const { logout, user } = useContext(AuthContext);
   const { cartItems, clearCart } = useContext(CartContext);
-  const { orders ,refreshOrders  } = useContext(OrdersContext);
+  const { orders, refreshOrders } = useContext(OrdersContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -19,6 +20,7 @@ const AdminDashboard = () => {
   };
 
   return (
+    <div>
     <nav
       style={{
         background: 'rgba(30, 30, 47, 0.95)',
@@ -52,7 +54,7 @@ const AdminDashboard = () => {
       {user && (
         <div style={{ display: 'flex', gap: '28px', alignItems: 'center' }}>
           {[
-            { label: 'Home', path: '/admin/home' },
+            { label: 'Home', path: '/' },
             { label: 'Users', path: '/users' },
             { label: 'Events', path: '/events' },
             { label: 'Category', path: '/allCategories' },
@@ -181,6 +183,8 @@ const AdminDashboard = () => {
         )}
       </div>
     </nav>
+    <AdminChatPanel/>
+    </div>
   );
 };
 

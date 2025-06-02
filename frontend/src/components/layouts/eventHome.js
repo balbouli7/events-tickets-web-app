@@ -42,7 +42,25 @@ const CategoryEventShowcase = () => {
 
         return (
           <div key={cat._id} style={{ marginBottom: "40px" }}>
-            <h3 style={{ margin: "50px", color: "#333" }}>
+<h3
+  style={{
+    margin: "50px auto",
+    maxWidth: "600px",
+    color: "#2c3e50",
+    fontSize: "2.5rem",
+    fontWeight: "700",
+    textAlign: "center",
+    textShadow: "2px 2px 8px rgba(44, 62, 80, 0.2)",
+    letterSpacing: "0.05em",
+    lineHeight: "1.2",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    background: "linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    userSelect: "none",
+    cursor: "default",
+  }}
+>
               {cat.name.toUpperCase()}
             </h3>
             <div

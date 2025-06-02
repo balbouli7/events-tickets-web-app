@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context.js/authContext";
-import { getAllOrders } from "../../api/userServices";
+import { getAllOrders, deleteOrder } from "../../api/userServices";
 
 const AdminOrderList = () => {
   const [orders, setOrders] = useState([]);
@@ -11,8 +11,32 @@ const AdminOrderList = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       const data = await getAllOrders(token);
-      setOrders(data);
+
+      // Filter and delete orders where event has started more than 1 hour ago
+      const now = new Date();
+      const ordersToDelete = data.filter((order) => {
+        if (!order.event?.startDate) return false;
+        const eventStart = new Date(order.event.startDate);
+        const oneHourAfterEvent = new Date(
+          eventStart.getTime() + 60 * 60 * 1000
+        );
+        return now > oneHourAfterEvent;
+      });
+
+      // Delete expired orders
+      if (ordersToDelete.length > 0) {
+        await Promise.all(
+          ordersToDelete.map((order) => deleteOrder(order._id, token))
+        );
+
+        // Fetch fresh list after deletion
+        const updatedData = await getAllOrders(token);
+        setOrders(updatedData);
+      } else {
+        setOrders(data);
+      }
     };
+
     fetchOrders();
   }, [token]);
 
@@ -154,7 +178,8 @@ const AdminOrderList = () => {
                       styles.linkHover.backgroundColor;
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = styles.link.backgroundColor;
+                    e.target.style.backgroundColor =
+                      styles.link.backgroundColor;
                   }}
                 >
                   View

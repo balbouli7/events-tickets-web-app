@@ -1,5 +1,6 @@
 import "./App.css";
 import { AuthProvider } from "./context.js/authContext";
+import { SocketProvider } from "./context.js/socketContext";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Register from "./components/authComponents/register";
 import { useEffect, useState } from "react";
@@ -32,7 +33,13 @@ import EventsByCategory from "./components/eventsComponents/eventsByCategory";
 import DashboardLayout from "./components/layouts/dashboardLayout";
 import HomePage from "./components/layouts/homePage";
 import Settings from "./components/settings";
-import Chat from "./components/chatComponent";
+import { io } from "socket.io-client";
+import AdminChatPanel from "./components/chatComponents/adminPanelChat";
+import AdminChatRoom from "./components/layouts/adminChatRoom";
+import UpdatePassword from "./components/authComponents/updatePassword";
+import AboutUs from "./components/layouts/aboutUs";
+import TermsAndConditions from "./components/layouts/terms";
+import Contact from "./components/layouts/contactUs";
 
 function App() {
   const [userEmail, setUserEmail] = useState("");
@@ -54,6 +61,7 @@ function App() {
   return (
     <div className="App">
       <AuthProvider>
+      <SocketProvider> 
         <CartProvider>
           <OrdersProvider>
             {isLoading && <LoadingSpinner />}
@@ -66,6 +74,7 @@ function App() {
                 <Route path="register" element={<Register setUserEmail={setUserEmail} />} />
                 <Route path="verify" element={<VerifyUser email={userEmail} />} />
                 <Route path="login" element={<Login />} />
+                <Route path="updatePassword" element={<UpdatePassword />} />
                 <Route path="forgetpassword" element={<ForgetPassword />} />
                 <Route path="resetpassword/:token" element={<ResetPassword />} />
                 <Route path="admin/home" element={<PrivateRoute element={<AdminHome />} />} />
@@ -87,12 +96,18 @@ function App() {
                 <Route path="allTickets" element={<PrivateRoute element={<AllTickets />} />} />
                 <Route path="eventsByCategory/:categoryId" element={<EventsByCategory />}/>
                 <Route path="settings" element={<Settings />}/>
-                <Route path="chat" element={<Chat />} />
+                <Route path="chat" element={<AdminChatPanel />}/>
+                <Route path="chat/:roomId" element={<AdminChatRoom/>} />
+                <Route path="aboutUs" element={<AboutUs/>} />
+                <Route path="terms" element={<TermsAndConditions />} />
+                <Route path="contact" element={<Contact />} />
+
               </Route>
 
             </Routes>
           </OrdersProvider>
         </CartProvider>
+        </SocketProvider>
       </AuthProvider>
     </div>
   );

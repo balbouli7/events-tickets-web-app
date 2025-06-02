@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const otpGenerator = require('otp-generator')
 const nodemailer = require('nodemailer')
+const validator = require('validator');
 const { upload, cloudinary } = require("../config/cloudinary");
 let otpStorage = {}
 //user register
@@ -235,5 +236,50 @@ exports.resetPassword = async (req, res) => {
   } catch (err) {
     console.error("Error in resetPassword:", err);
     res.status(500).json({ message: err.message });
+  }
+};
+
+// Controller to update user password
+exports.updatePassword = async (req, res) => {
+  try {
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+      const userId = req.user.id; // Extracted from the verified token
+
+      // Validate inputs
+      if (!currentPassword || !newPassword || !confirmPassword) {
+          return res.status(400).json({ error: 'All fields are required' });
+      }
+
+      if (newPassword !== confirmPassword) {
+          return res.status(400).json({ error: 'New passwords do not match' });
+      }
+
+      const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+      if (!passwordPattern.test(newPassword)) {
+          return res.status(400).json({ error: "Password must contain at least one uppercase letter, one lowercase letter, and be at least 8 characters long." });
+      }
+
+      // Find the user
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Verify current password
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+          return res.status(401).json({ error: 'Current password is incorrect' });
+      }
+
+      // Update the password
+      user.password=newPassword
+      user.confirmPassword=newPassword
+      await user.save();
+
+      res.status(200).json({ message: 'Password updated successfully' });
+
+  } catch (error) {
+      console.error('Error updating password:', error);
+      res.status(500).json({ error: 'Server error while updating password' });
   }
 };

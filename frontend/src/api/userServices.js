@@ -80,6 +80,21 @@ export const resetPassword = async (token, email, newPassword) => {
   }
 };
 
+// update password
+export const updatePassword = async (currentPassword, newPassword, confirmPassword) => {
+  try {
+    const response = await axios.put(
+      `${API_URL}/updatePassword`,
+      { currentPassword, newPassword, confirmPassword },
+      { headers: getAuthHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating password:', error);
+    throw error.response?.data || { error: 'Failed to update password' };
+  }
+};
+
 // Get all users (Admin route)
 export const getAllUsers = async () => {
   try {
