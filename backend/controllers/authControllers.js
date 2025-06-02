@@ -29,6 +29,10 @@ exports.userRegister = async (req, res) => {
       if (emailExists) {
           return res.status(400).json({ error: "Email already exists." });
       }
+      if (!/^\d{8}$/.test(mobile)) {
+        return res.status(400).json({ error: "Mobile number must be exactly 8 digits." });
+    }
+    
 
       const mobileExists = await User.findOne({ mobile });
       if (mobileExists) {
@@ -258,7 +262,7 @@ exports.updatePassword = async (req, res) => {
       if (!passwordPattern.test(newPassword)) {
           return res.status(400).json({ error: "Password must contain at least one uppercase letter, one lowercase letter, and be at least 8 characters long." });
       }
-
+      
       // Find the user
       const user = await User.findById(userId);
       if (!user) {

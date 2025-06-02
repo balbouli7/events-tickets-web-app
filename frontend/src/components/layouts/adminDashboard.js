@@ -47,7 +47,7 @@ const AdminDashboard = () => {
           letterSpacing: '1px',
         }}
       >
-        🎟️ MyApp
+        🎟️ TICKETY
       </Link>
 
       {/* Admin Links */}

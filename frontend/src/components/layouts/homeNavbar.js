@@ -37,7 +37,7 @@ const HomeNavbar = () => {
             }}
           >
             <FaTicketAlt style={logoIconStyle} />
-            <span> MyApp</span>
+            <span> TICKETY</span>
           </Link>
         </div>
 

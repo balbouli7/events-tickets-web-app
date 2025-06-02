@@ -63,7 +63,7 @@ const Footer = () => {
       </div>
 
       <div style={copyrightStyle}>
-        &copy; {new Date().getFullYear()} MyApp. All rights reserved.
+        &copy; {new Date().getFullYear()} TICKETY. All rights reserved.
       </div>
     </footer>
   );

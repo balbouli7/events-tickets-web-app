@@ -90,7 +90,6 @@ export default function Register({ setUserEmail }) {
             style={inputStyle}
           />
           <input
-            type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}

@@ -28,7 +28,6 @@ export default function UpdateUser() {
           setEmail(fetchedUser.email || "");
           setMobile(fetchedUser.mobile || "");
           setAddress(fetchedUser.address || "");
-          setRole(fetchedUser.role || "");
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -45,7 +44,7 @@ export default function UpdateUser() {
 
   const updateSubmit = async (e) => {
     e.preventDefault();
-    if (!firstName || !lastName || !email || !mobile || !address || !role) {
+    if (!firstName || !lastName || !email || !mobile || !address) {
       setMessage("All fields are required");
       return;
     }
@@ -56,7 +55,6 @@ export default function UpdateUser() {
       email,
       mobile,
       address,
-      role,
     };
 
     try {
@@ -177,14 +175,6 @@ export default function UpdateUser() {
           placeholder="Address"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          required
-          style={inputStyle}
-        />
-        <input
-          type="text"
-          placeholder="Role"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
           required
           style={inputStyle}
         />

@@ -50,7 +50,7 @@ const AddCategory = () => {
           required
           value={categoryData.name}
           onChange={handleInputChange}
-          placeholder="Category Name (e.g. VIP, General)"
+          placeholder="Category Name"
           style={inputStyle}
         />
 
